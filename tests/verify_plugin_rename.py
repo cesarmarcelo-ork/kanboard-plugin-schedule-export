@@ -1,7 +1,8 @@
 """Verify that Kanboard plugin identity was migrated as an atomic unit."""
 from pathlib import Path
 base=Path(__file__).resolve().parent.parent
-assert base.name == 'ScheduleExport'
+# The Git checkout may have any directory name; Kanboard plugin identity is verified below.
+assert (base/'Plugin.php').is_file()
 assert not (base/'Controller/ProjectLibreExportController.php').exists()
 plugin=(base/'Plugin.php').read_text(encoding='utf-8')
 assert r'namespace Kanboard\Plugin\ScheduleExport;' in plugin
