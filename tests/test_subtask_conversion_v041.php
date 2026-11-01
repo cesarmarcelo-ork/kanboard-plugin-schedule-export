@@ -24,6 +24,9 @@ namespace {
             return $this->result;
         }
     }
+    class FakeLink {
+        public function getByLabel($label) { return array('id' => 3); }
+    }
     class FakeSubtask {
         public $pdo;
         public $deleted = array();
@@ -75,7 +78,7 @@ namespace {
     $subtasks = new FakeSubtask($pdo);
     $created = new FakeTaskCreation();
     $metadata = new FakeMetadata();
-    $link = new FakeService();
+    $link = new FakeLink();
     $links = new FakeService();
     $tags = new FakeService();
     $conversion = new \Kanboard\Plugin\ScheduleExport\Model\PlannedSubtaskConversionModel(array(
@@ -91,6 +94,9 @@ namespace {
     check041($v['date_due']===(string)strtotime('2026-11-06 17:00:00'),'End was not transferred');
     check041($v['time_estimated']==3.5 && $v['time_spent']==1.25,'Native time tracking changed');
     check041($plans->get(100)===null,'Source plan was not removed by FK cascade');
+    check041($subtasks->getById(100)===false,'Converted subtask was not removed');
+    check041(count($links->args)===1,'Native parent/child link was not created');
+    check041(count($tags->args)===1,'Native tag duplication was not invoked');
     check041(count($metadata->calls)===1 && $metadata->calls[0][1]['schedule_export_workday_minutes']==='480',
         'Planning metadata not preserved');
 
