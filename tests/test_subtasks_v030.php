@@ -12,7 +12,7 @@ $project = array('id'=>1,'name'=>'EAP regression');
 $tasks = array(
     array('id'=>10,'project_id'=>1,'title'=>'Parent','position'=>1,'date_started'=>$day,'date_due'=>$day+86400,'time_estimated'=>4),
     array('id'=>11,'project_id'=>1,'title'=>'Child','position'=>2,'date_started'=>$day,'date_due'=>$day+3600,'time_estimated'=>1),
-    array('id'=>20,'project_id'=>1,'title'=>'Native only','position'=>3,'date_started'=>$day,'date_due'=>$day+86400,'time_estimated'=>3),
+    array('id'=>20,'project_id'=>1,'title'=>'Native only','position'=>3,'date_started'=>$day,'date_due'=>$day+86400,'time_estimated'=>3,'description'=>'[SE_SUBTASK_PERIOD id=17 start=2026-10-27T09:00:00 end=2026-10-29T17:00:00]'),
     array('id'=>30,'project_id'=>1,'title'=>'After Native','position'=>4,'date_started'=>$day+86400,'date_due'=>$day+2*86400,'time_estimated'=>2),
 );
 $links = array(
@@ -37,10 +37,34 @@ ensure(strpos($detailed,'<WBS>1.3</WBS>') !== false,'Missing deadline milestone 
 ensure(strpos($detailed,'Source: kanboard-subtask:20:17') !== false,'Missing native-only parent subtask');
 ensure(strpos($detailed,'<WBS>2.1</WBS>') !== false,'Missing native-only WBS');
 ensure(strpos($detailed,'<WBS>2.2</WBS>') !== false,'Missing native-only deadline milestone');
+ensure(strpos($detailed,'<Start>2026-10-27T09:00:00</Start>') !== false,'Explicit subtask start missing');
+ensure(strpos($detailed,'<Finish>2026-10-29T17:00:00</Finish>') !== false,'Explicit subtask finish missing');
+ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>No child cards</Name>(?:(?!</Task>).)*<Milestone>0</Milestone>(?:(?!</Task>).)*</Task>~s', $detailed),'Period subtask should show Gantt bar');
+ensure(strpos($legacy,'<Name>No child cards</Name>') === false,'Legacy must not produce subtask row');
+
 ensure(strpos($legacy,'<PredecessorUID>20</PredecessorUID>') !== false,'Legacy blocker missing');
 ensure(strpos($detailed,'<PredecessorUID>20</PredecessorUID>') !== false,'Detailed mode removed existing blocker');
 ensure(strpos($detailed,'NAO PLANEJADA') !== false,'Missing no-dates warning');
 ensure(substr_count($detailed,'<UID>') === count(array_unique(
     array_map('intval', preg_match_all('/<UID>(\\d+)<\\/UID>/', $detailed, $matches) ? $matches[1] : array())
 )), 'UID collision');
+// Invalid, reversed, duplicate or unknown periods must never create inferred schedules.
+$invalidDescriptions = array(
+    '[SE_SUBTASK_PERIOD id=17 start=2026-10-29T17:00:00 end=2026-10-27T09:00:00]',
+    '[SE_SUBTASK_PERIOD id=17 start=2026-02-30T09:00:00 end=2026-03-01T09:00:00]',
+    '[SE_SUBTASK_PERIOD id=18 start=2026-10-27T09:00:00 end=2026-10-29T17:00:00]',
+    '[SE_SUBTASK_PERIOD id=17 start=2026-10-27T09:00:00 end=2026-10-29T17:00:00]' . "\\n" .
+      '[SE_SUBTASK_PERIOD id=17 start=2026-10-28T09:00:00 end=2026-10-29T17:00:00]',
+    '[SE_SUBTASK_PERIOD id=17 start=2026-10-27T09:00:00]',
+);
+foreach ($invalidDescriptions as $badDescription) {
+    $badTasks = $tasks;
+    $badTasks[2]['description'] = $badDescription;
+    try {
+        $exporter->generate($project, $badTasks, $links, '2026-10-26', $subtasks, true);
+        throw new RuntimeException('Invalid subtask period was accepted');
+    } catch (InvalidArgumentException $expected) {
+        // Invalid declarations fail explicitly; no silent inferred bar.
+    }
+}
 echo "PASS: v0.3.0 legacy and detailed WBS regression\n";
