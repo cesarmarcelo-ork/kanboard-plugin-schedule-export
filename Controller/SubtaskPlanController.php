@@ -48,4 +48,14 @@ class SubtaskPlanController extends BaseController
             'task_id'=>$task['id'],'project_id'=>$task['project_id']
         )));
     }
+    public function remove()
+    {
+        $this->checkCSRFForm();
+        list($task,$subtask) = $this->context();
+        $this->planModel()->delete((int)$task['project_id'],(int)$task['id'],(int)$subtask['id']);
+        $this->response->redirect($this->helper->url->to('TaskViewController','show',array(
+            'task_id'=>$task['id'],'project_id'=>$task['project_id']
+        )));
+    }
+
 }
