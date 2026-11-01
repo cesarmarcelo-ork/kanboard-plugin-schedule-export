@@ -1,0 +1,26 @@
+<section class="page-header">
+    <h2>Planejamento da subtarefa: <?= $this->text->e($subtask['title']) ?></h2>
+</section>
+<p>Cartão #<?= (int)$task['id'] ?>. As datas são explícitas e independentes das horas nativas estimadas ou gastas.</p>
+<form method="post" action="<?= $this->url->href('SubtaskPlanController','save',array('plugin'=>'ScheduleExport','project_id'=>$task['project_id'],'task_id'=>$task['id'],'subtask_id'=>$subtask['id'])) ?>">
+    <?= $this->form->csrf() ?>
+    <fieldset>
+        <legend>Planejado</legend>
+        <label for="planned_start">Data e hora inicial</label>
+        <input id="planned_start" name="planned_start" type="datetime-local" step="1" required
+            value="<?= $this->text->e($plan['planned_start'] ?? '') ?>">
+        <label for="planned_end">Data e hora final</label>
+        <input id="planned_end" name="planned_end" type="datetime-local" step="1" required
+            value="<?= $this->text->e($plan['planned_end'] ?? '') ?>">
+        <label for="workday_minutes">Jornada (minutos/dia)</label>
+        <input id="workday_minutes" name="workday_minutes" type="number" min="1" max="1440" required
+            value="<?= (int)($plan['workday_minutes'] ?? 480) ?>">
+        <p>Dias considerados (1 = segunda, 7 = domingo)</p>
+        <?php $selected = explode(',', $plan['workdays'] ?? '1,2,3,4,5'); ?>
+        <?php foreach (array(1=>'Seg',2=>'Ter',3=>'Qua',4=>'Qui',5=>'Sex',6=>'Sáb',7=>'Dom') as $n=>$name): ?>
+            <label><input type="checkbox" name="workdays[]" value="<?= $n ?>" <?= in_array((string)$n,$selected,true)?'checked':'' ?>> <?= $name ?></label>
+        <?php endforeach ?>
+    </fieldset>
+    <button type="submit" class="btn btn-blue">Salvar período</button>
+    <?= $this->url->link('Cancelar','TaskViewController','show',array('task_id'=>$task['id'],'project_id'=>$task['project_id'])) ?>
+</form>
