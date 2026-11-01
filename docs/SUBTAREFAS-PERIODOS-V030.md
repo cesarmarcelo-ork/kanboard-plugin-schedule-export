@@ -24,7 +24,12 @@ Esta funcionalidade **não altera** a exportação padrão `Exportar cronograma 
 - Subtarefas nativas **sem** linha de período aparecem como marcos técnicos `SEM DATAS — NAO PLANEJADA`, não como barras fictícias.
 - O período explícito é tratado como **janela de calendário**. `time_estimated` permanece uma estimativa de esforço separada.
 - A opção experimental não depende da extensão K-OrkFlowTech, não cria campos no banco, não escreve no Kanboard e não modifica as datas de origem.
-- A presença de subtarefas transforma visualmente seu cartão em tarefa-resumo; importadores MSPDI podem recalcular as datas da tarefa-resumo e ter limitações para vínculos com ela. Conferir após a importação.
+- **Todo cartão permanece no XML com seu próprio UID, título e hierarquia**, mesmo tendo cartões-filhos, subtarefas nativas ou ambos.
+- No modo detalhado, quando um cartão se torna tarefa-resumo e possui início e fim válidos no Kanboard, uma linha auxiliar **`Periodo do cartao: <titulo>`** preserva sua barra original. Ela é subordinada ao cartão na EAP, mas **não** é um segundo cartão, uma subtarefa nativa nem uma nova atividade.
+- Se o cartão-resumo possui somente início, a linha auxiliar registra apenas um marco de início; se possui somente prazo, o marco auxiliar de prazo já existente é utilizado. Sem datas, não se inventa uma barra.
+- A barra de resumo pode ser recalculada pelo ProjectLibre conforme seus descendentes e incluir marcos técnicos de subtarefas sem datas. **A referência fiel do período próprio do cartão é a linha auxiliar `Periodo do cartao`.** Essa representação precisa de homologação visual no ProjectLibre e OPS.
+- O modo legado da v0.2.0 fica intocado: nenhuma linha adicional de período do cartão é adicionada à exportação padrão.
+- Importadores MSPDI podem ter limitações para vínculos entre tarefas-resumo; conferir dependências e caminho crítico após a importação.
 - Datas e horários são guardados nos campos MSPDI Start/Finish, com compatibilidade de duração do ProjectLibre 1.9.8 e calendário 7×24 já adotados pela v0.2.0.
 
 ## Estado da versão
