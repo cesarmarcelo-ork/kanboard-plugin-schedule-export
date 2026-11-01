@@ -1,6 +1,6 @@
-# Kanboard Schedule Export — v0.2.0
+# Kanboard Schedule Export — v0.4.1 (estável)
 
-Plugin **somente leitura** para exportar projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
+Plugin de **planejamento de subtarefas e exportação** de projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
 
 ## Funcionamento
 
@@ -9,7 +9,7 @@ Plugin **somente leitura** para exportar projetos Kanboard em **Microsoft Projec
 3. No menu do projeto, selecionar **Exportar cronograma (.xml)**.
 4. Abrir o arquivo `kanboard-ID-cronograma.xml` no aplicativo compatível.
 
-O plugin não exige token pessoal/API no navegador, não grava no banco de dados, não chama serviços externos e não modifica cartões.
+O plugin não exige token pessoal/API no navegador nem serviços externos. O planejamento de subtarefas é gravado na tabela própria `schedule_export_subtask_plans`. Nesta candidata, ao converter uma subtarefa com período planejado em tarefa, as datas são transferidas para os campos nativos do novo cartão. A extensão K-OrkFlowTech mantém dados locais separados.
 
 ## Fidelidade dos dados e limitações
 
@@ -17,7 +17,7 @@ O plugin não exige token pessoal/API no navegador, não grava no banco de dados
 - Datas e horas originais são guardadas em Start/Finish/Deadline e nas observações. Calendário MSPDI **24h por dia, 7 dias por semana** para evitar o deslocamento de prazos de fim de semana.
 - Somente prazo ou somente início: **marco**; ambas ausentes: cartão marcado como **sem datas — não planejado**, com âncora exclusivamente técnica.
 - Relações pai/filho viram EAP; cada pai com prazo recebe um **marco auxiliar**. Cartões-pai podem mostrar duração agregada diferente do seu próprio prazo original.
-- Subtarefas nativas sem datas são preservadas nas observações; **não** são transformadas em barras fictícias.
+- Subtarefas nativas sem datas são exportadas explicitamente como não planejadas, com duração zero; o ProjectLibre pode desenhá-las como losangos por limitação visual.
 - Relações de duplicação são ignoradas como dependências. Conflitos nos dados originais são apontados, não corrigidos silenciosamente.
 - O campo `Duration` contém ajuste de **1 minuto por dia completo** validado com **ProjectLibre 1.9.8 Linux**; **isso não é duração estimada do Kanboard** e poderá ser interpretado diferentemente por outros aplicativos. O OPS passou no teste de importação, mas ainda requer validação independente de precisão de minutos nos campos internos e análise de caminho crítico.
 
@@ -41,4 +41,9 @@ python3 tests/verify_source_snapshot.py /caminho/snapshot.json /tmp/kanboard-cro
 
 Veja **`MIGRACAO.md`** e **`HOMOLOGACAO-OPS.md`**.
 
-**Versão:** 0.2.0 estável. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
+**Versão estável:** 0.4.1; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
+
+
+## Correção v0.4.1
+
+A conversão nativa **subtarefa → tarefa** agora captura o planejamento antes de excluir a subtarefa original: copia `planned_start` para `date_started` e `planned_end` para `date_due`, sem inventar datas quando não há planejamento. Preserva as horas nativas e registra os parâmetros de jornada/dias úteis nos metadados da nova tarefa para rastreabilidade. Conversões malsucedidas não devem remover a subtarefa original. A transferência foi verificada em testes automatizados e funcionais na homelab; outras configurações de fuso horário e plugins que substituam o mesmo serviço de conversão requerem validação específica.

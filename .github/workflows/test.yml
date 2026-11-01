@@ -34,6 +34,8 @@ jobs:
         run: php tests/test_subtasks_v030.php
       - name: Verify native subtask planning v0.4.0 (SQLite and MSPDI)
         run: php tests/test_native_plans_v040.php
+      - name: Verify v0.4.1 conversion of native subtasks to tasks
+        run: php tests/test_subtask_conversion_v041.php
       - name: Verify v0.4 native UI wiring, access control and CSRF
         run: python3 tests/verify_v040_ui_wiring.py
       - name: Upload synthetic v0.3.0 MSPDI sample for ProjectLibre review
