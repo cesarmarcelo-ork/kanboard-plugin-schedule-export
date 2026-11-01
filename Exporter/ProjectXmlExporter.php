@@ -346,11 +346,11 @@ class ProjectXmlExporter
                         'Start'=>$subStart,
                         'Finish'=>$subFinish,
                         'Duration'=>$period ? $this->durationBetween($period['start'],$period['finish']) : 'PT0H0M0S',
-                        'DurationFormat'=>7,'Milestone'=>$period ? 0 : 1,
+                        'DurationFormat'=>7,'Milestone'=>0,
                         'Notes'=>'Source: kanboard-subtask:' . $parentId . ':' . (int)$sub['id'] .
                             ($period
                                 ? "\nPeriodo explicito cadastrado na descricao do cartao Kanboard; horario local: " . $subStart . ' a ' . $subFinish . '.'
-                                : "\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico posicionado no limite do cartao quando disponivel; NAO e agendamento de subtarefa.") .
+                                : "\nSubtarefa nativa SEM DATAS PROPRIAS; tarefa nao planejada de duracao ZERO, posicionada visualmente no limite do cartao quando disponivel; NAO e agendamento de subtarefa.") .
                             "\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0')
                     );
                     if ($period) {
