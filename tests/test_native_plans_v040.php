@@ -48,4 +48,8 @@ nativeAssert(strpos($xml,'<Name>Native scheduled</Name>')!==false,'Persisted sub
 nativeAssert(strpos($xml,'<Start>2026-11-03T09:00:00</Start>')!==false,'Persisted date not in MSPDI');
 nativeAssert((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>Native unscheduled \\[SEM DATAS — NAO PLANEJADA\\]</Name>(?:(?!</Task>).)*<Duration>PT0H0M0S</Duration>(?:(?!</Task>).)*<Milestone>0</Milestone>(?:(?!</Task>).)*</Task>~s',$xml),'Unplanned subtask should be non-milestone');
 nativeAssert(strpos($xml,'Source: kanboard-card-period:1:10')!==false,'Parent own period lost');
+nativeAssert($model->delete(2,10,100) === true,'Unauthorized delete query failed');
+nativeAssert($model->get(100) !== null,'Other project deleted plan');
+nativeAssert($model->delete(1,10,100) === true,'Correct delete failed');
+nativeAssert($model->get(100) === null,'Plan still present after deletion');
 echo "PASS: v0.4 native planning sqlite, ownership and MSPDI\n";
