@@ -13,6 +13,11 @@ class Plugin extends Base
 {
     public function initialize()
     {
+        // Replace only the native conversion service, preserving its public method contract.
+        $this->container['subtaskTaskConversionModel'] = function ($container) {
+            return new \\Kanboard\\Plugin\\ScheduleExport\\Model\\PlannedSubtaskConversionModel($container);
+        };
+
         $this->projectAccessMap->add('ScheduleExportController', 'download', Role::PROJECT_VIEWER);
         $this->projectAccessMap->add('SubtaskPlanController', 'edit', Role::PROJECT_VIEWER);
         $this->projectAccessMap->add('SubtaskPlanController', 'save', Role::PROJECT_MEMBER);
@@ -57,7 +62,7 @@ class Plugin extends Base
 
     public function getPluginVersion()
     {
-        return '0.4.0';
+        return '0.4.1-rc1';
     }
 
     public function getPluginHomepage()
