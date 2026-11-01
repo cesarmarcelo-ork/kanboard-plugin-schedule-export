@@ -330,7 +330,13 @@ class ProjectXmlExporter
                     $number = count($children[$parentId] ?? array()) + (isset($ownPeriodRow[$parentId]) ? 1 : 0) + $subIndex + 1;
                     $subName = (string) ($sub['title'] ?? ('Subtask ' . $sub['id']));
                     $period = $subtaskPeriods[$parentId][(int)$sub['id']] ?? null;
-                    $subStart = $period ? $this->sourceIso($period['start']) : $this->iso($anchorDate,self::ANCHOR_CLOCK);
+                    // An undated subtask remains a technical milestone. Place it
+                    // at the card's source start (or due) only for visualization,
+                    // never as a claimed native-subtask schedule.
+                    $technicalAnchor = $this->sourceIso($byId[$parentId]['date_started'] ?? 0)
+                        ?: ($this->sourceIso($byId[$parentId]['date_due'] ?? 0)
+                            ?: $this->iso($anchorDate,self::ANCHOR_CLOCK));
+                    $subStart = $period ? $this->sourceIso($period['start']) : $technicalAnchor;
                     $subFinish = $period ? $this->sourceIso($period['finish']) : $subStart;
                     $subFields = array(
                         'UID'=>$nextUid++, 'ID'=>$nextId++,
@@ -344,7 +350,7 @@ class ProjectXmlExporter
                         'Notes'=>'Source: kanboard-subtask:' . $parentId . ':' . (int)$sub['id'] .
                             ($period
                                 ? "\nPeriodo explicito cadastrado na descricao do cartao Kanboard; horario local: " . $subStart . ' a ' . $subFinish . '.'
-                                : "\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico, NAO cronograma.") .
+                                : "\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico posicionado no limite do cartao quando disponivel; NAO e agendamento de subtarefa.") .
                             "\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0')
                     );
                     if ($period) {
