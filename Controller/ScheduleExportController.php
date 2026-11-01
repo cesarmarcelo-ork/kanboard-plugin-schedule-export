@@ -4,6 +4,7 @@ namespace Kanboard\Plugin\ScheduleExport\Controller;
 
 use Kanboard\Controller\BaseController;
 use Kanboard\Plugin\ScheduleExport\Exporter\ProjectXmlExporter;
+use Kanboard\Plugin\ScheduleExport\Model\SubtaskPlanModel;
 
 /** Exports only the project the authenticated Kanboard user may view. */
 class ScheduleExportController extends BaseController
@@ -34,8 +35,11 @@ class ScheduleExportController extends BaseController
         }
 
         $exporter = new ProjectXmlExporter($this->timezoneModel->getCurrentTimezone());
-        $xml = $exporter->generate($project, $tasks, $links, null, $subtasksByTask);
-        $filename = 'kanboard-' . $projectId . '-cronograma.xml';
+        // Detailed export is the default. Legacy format remains available via ?subtasks=legacy.
+        $detailed = $this->request->getStringParam('subtasks') !== 'legacy';
+        $plans = $detailed ? (new SubtaskPlanModel($this->db->getConnection()))->getByTaskIds(array_keys($knownIds)) : array();
+        $xml = $exporter->generate($project, $tasks, $links, null, $subtasksByTask, $detailed, $plans);
+        $filename = 'kanboard-' . $projectId . ($detailed ? '-subtarefas' : '') . '-cronograma.xml';
         $this->response->withFileDownload($filename);
         $this->response->xml($xml);
     }
