@@ -2,9 +2,9 @@
 
 [![Kanboard plugin](https://img.shields.io/badge/Kanboard-plugin-informational)](https://kanboard.org/)
 
-Read-only Kanboard plugin that exports project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
+Kanboard plugin for persistent native-subtask scheduling and export of project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
 
-**Current version:** `0.4.0` (stable). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
+**Released version:** `0.4.0` (stable). **Development candidate:** `0.4.1-rc1` (not yet released). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
 
 ## Use
 
@@ -12,7 +12,7 @@ Read-only Kanboard plugin that exports project schedules as **Microsoft Project 
 2. Open an authorized Kanboard project and select **Exportar cronograma (.xml)** from its project menu.
 3. Open the downloaded `kanboard-PROJECT_ID-cronograma.xml` in an MSPDI-compatible application.
 
-No personal API token or browser extension is required. The plugin reads Kanboard project data but does not update tasks, use external services, or alter the database.
+No personal API token or browser extension is required. The plugin stores subtask planning in its own database table. The v0.4.1 candidate also copies scheduled subtask dates to a new Kanboard task during native subtask-to-task conversion; external services are not used.
 
 ## Data representation
 
@@ -35,3 +35,8 @@ License: MIT. Maintained by OrkFlowTech.
 ## Novidades da v0.4.0
 
 A exportação XML detalhada é o padrão em uma única entrada no menu. Subtarefas nativas podem ter períodos cadastrados no Kanboard pela coluna **Planejamento / Datas**, sem modificar o rastreamento de tempo. O modo anterior está disponível pelo parâmetro `subtasks=legacy`. Veja [notas da versão](docs/RELEASE-V040.md) para migração, limitações visuais dos importadores e homologação.
+
+
+## v0.4.1 conversion fix (development candidate)
+
+When Kanboard converts a native subtask into a task, its Schedule Export dates are transferred to the new task's native start/due fields before the original subtask is removed. Additional workday parameters are recorded in task metadata; native time-tracking values are left unchanged. This is a release candidate pending installation-level acceptance tests. See [v0.4.1 test plan](docs/TESTE-CONVERSAO-V041.md).
