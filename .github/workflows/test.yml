@@ -30,3 +30,5 @@ jobs:
           python3 tests/verify_matrix.py "$OUT"
       - name: Verify renamed plugin wiring
         run: python3 tests/verify_plugin_rename.py
+      - name: Verify experimental native-subtask WBS and legacy regression
+        run: php tests/test_subtasks_v030.php
