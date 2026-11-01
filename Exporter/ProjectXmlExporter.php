@@ -318,7 +318,7 @@ class ProjectXmlExporter
                     'ConstraintType'=>2, 'ConstraintDate'=>$ownStart,
                     'Notes'=>'Linha auxiliar de visualizacao do periodo ORIGINAL do cartao Kanboard #' . $closingOwner .
                         "\nSource: kanboard-card-period:" . (int)$project['id'] . ':' . $closingOwner .
-                        "\nNao e um novo cartao nem uma subtarefa; nao implica duracao das subtarefas.'
+                        "\nNao e um novo cartao nem uma subtarefa; nao implica duracao das subtarefas."
                 );
                 if ($ownHasPeriod) $ownFields['Deadline'] = $ownFinish;
                 $xml .= "    <Task>\n" . $this->fields($ownFields,3) . "    </Task>\n";
