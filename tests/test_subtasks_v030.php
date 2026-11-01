@@ -14,6 +14,7 @@ $tasks = array(
     array('id'=>11,'project_id'=>1,'title'=>'Child','position'=>2,'date_started'=>$day,'date_due'=>$day+3600,'time_estimated'=>1),
     array('id'=>20,'project_id'=>1,'title'=>'Native only','position'=>3,'date_started'=>strtotime('2026-10-27 09:00:00 UTC'),'date_due'=>strtotime('2026-10-29 17:00:00 UTC'),'time_estimated'=>3,'description'=>'[SE_SUBTASK_PERIOD id=17 start=2026-10-27T09:00:00 end=2026-10-29T17:00:00]'),
     array('id'=>30,'project_id'=>1,'title'=>'After Native','position'=>4,'date_started'=>strtotime('2026-10-29 18:00:00 UTC'),'date_due'=>strtotime('2026-10-30 18:00:00 UTC'),'time_estimated'=>2),
+    array('id'=>40,'project_id'=>1,'title'=>'Card with undated native','position'=>5,'date_started'=>strtotime('2026-11-10 10:00:00 UTC'),'date_due'=>strtotime('2026-11-12 18:00:00 UTC'),'time_estimated'=>3),
 );
 $links = array(
     10=>array(array('task_id'=>11,'label'=>'is a parent of')),
@@ -23,6 +24,7 @@ $subtasks = array(
     10=>array(array('id'=>15,'task_id'=>10,'title'=>'Checklist A','time_estimated'=>2)),
     11=>array(array('id'=>16,'task_id'=>11,'title'=>'Checklist B','time_estimated'=>1)),
     20=>array(array('id'=>17,'task_id'=>20,'title'=>'No child cards','time_estimated'=>2)),
+    40=>array(array('id'=>18,'task_id'=>40,'title'=>'Undated native','time_estimated'=>2)),
 );
 $legacy = $exporter->generate($project,$tasks,$links,'2026-10-26',$subtasks);
 $explicitLegacy = $exporter->generate($project,$tasks,$links,'2026-10-26',$subtasks,false);
@@ -38,8 +40,11 @@ ensure(strpos($detailed,'Source: kanboard-subtask:20:17') !== false,'Missing nat
 ensure(strpos($detailed,'Source: kanboard-card-period:1:10') !== false,'Missing own bar of parent with child cards');
 ensure(strpos($detailed,'Source: kanboard-card-period:1:11') !== false,'Missing own bar of child card with subtasks');
 ensure(strpos($detailed,'Source: kanboard-card-period:1:20') !== false,'Missing own bar of card with only subtasks');
+ensure(strpos($detailed,'Source: kanboard-card-period:1:40') !== false,'Missing own bar of card with undated subtasks');
+ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>Undated native \[SEM DATAS — NAO PLANEJADA\]</Name>(?:(?!</Task>).)*<Start>2026-11-10T10:00:00</Start>(?:(?!</Task>).)*<Milestone>1</Milestone>(?:(?!</Task>).)*</Task>~s',$detailed),'Technical subtask milestone should be anchored at card start, not earliest project date');
+
 ensure(strpos($legacy,'kanboard-card-period:') === false,'Legacy mode must not introduce synthetic own bars');
-ensure(substr_count($detailed,'<Name>Periodo do cartao: ') === 3,'Expected own bar for all three summary cards');
+ensure(substr_count($detailed,'<Name>Periodo do cartao: ') === 4,'Expected own bar for all four summary cards');
 ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>Periodo do cartao: Native only</Name>(?:(?!</Task>).)*<Start>2026-10-27T09:00:00</Start>(?:(?!</Task>).)*<Finish>2026-10-29T17:00:00</Finish>(?:(?!</Task>).)*<Milestone>0</Milestone>(?:(?!</Task>).)*</Task>~s',$detailed),'Native-only card lost its own planned bar');
 ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<UID>20</UID>(?:(?!</Task>).)*<Name>Native only</Name>(?:(?!</Task>).)*</Task>~s',$detailed),'Original card UID must remain visible');
 
