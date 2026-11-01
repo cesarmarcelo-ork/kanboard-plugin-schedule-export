@@ -25,7 +25,7 @@ class ProjectXmlExporter
         return (new DateTimeImmutable('@' . (int)$timestamp))->setTimezone($this->timezone)->format($pattern);
     }
 
-    public function generate(array $project, array $tasks, array $linksByTask, $anchor = null, array $subtasksByTask = array())
+    public function generate(array $project, array $tasks, array $linksByTask, $anchor = null, array $subtasksByTask = array(), $detailedSubtasks = false)
     {
         $byId = array();
         foreach ($tasks as $task) {
@@ -114,10 +114,13 @@ class ProjectXmlExporter
             }
         }
         $summary = array_fill_keys(array_keys($children), true);
+        if ($detailedSubtasks) {
+            foreach (array_keys($nativeNotes) as $taskId) $summary[$taskId] = true;
+        }
         $edges = array();
         $notesProject = array(
             'Fonte: Kanboard. Exportacao somente leitura; nenhuma atividade e alterada.',
-            'Cartoes: ' . count($byId) . '; vinculos EAP: ' . count($parents) . '; subtarefas nativas apenas nas observacoes: ' . count($subIds) . '.',
+            'Cartoes: ' . count($byId) . '; vinculos EAP: ' . count($parents) . '; subtarefas nativas: ' . count($subIds) . ($detailedSubtasks ? ' (EAP detalhada, sem datas proprias).' : ' (apenas nas observacoes).'),
             'Politica: NUNCA inferir inicio a partir do prazo e duracao.',
             'Horario real de Kanboard exportado quando cadastrado; calendario 24 horas/7 dias para evitar ajustes automaticos.',
             'Calendario de 7 dias permite representar datas originais que caiam em sabados ou domingos.',
@@ -155,6 +158,17 @@ class ProjectXmlExporter
             $last = $pos;
             for ($j=$pos+1; $j<count($ordered) && $levels[$ordered[$j]] > $levels[$id]; $j++) $last=$j;
             $atEnd[$last][] = $id;
+        }
+        // Native subtasks are emitted after the card's last descendant so WBS
+        // remains valid even when a card also has child cards.
+        $subAtEnd = array();
+        if ($detailedSubtasks) {
+            foreach ($ordered as $pos => $id) {
+                if (empty($nativeNotes[$id])) continue;
+                $last = $pos;
+                for ($j=$pos+1; $j<count($ordered) && $levels[$ordered[$j]] > $levels[$id]; $j++) $last=$j;
+                $subAtEnd[$last][] = $id;
+            }
         }
         foreach ($atEnd as &$closing) usort($closing,function($a,$b) use($levels){return $levels[$b] <=> $levels[$a];});
         unset($closing);
@@ -230,12 +244,32 @@ class ProjectXmlExporter
                 $xml .= "      </PredecessorLink>\n";
             }
             $xml .= "    </Task>\n";
+            foreach ($subAtEnd[$pos] ?? array() as $parentId) {
+                foreach ($nativeNotes[$parentId] as $subIndex => $sub) {
+                    if ($nextUid > 2147483647) throw new \\RuntimeException('No more UIDs for native subtasks');
+                    $number = count($children[$parentId] ?? array()) + $subIndex + 1;
+                    $subName = (string) ($sub['title'] ?? ('Subtask ' . $sub['id']));
+                    $subFields = array(
+                        'UID'=>$nextUid++, 'ID'=>$nextId++,
+                        'Name'=>$subName . ' [SEM DATAS — NAO PLANEJADA]',
+                        'WBS'=>$wbs[$parentId] . '.' . $number,
+                        'OutlineLevel'=>$levels[$parentId] + 1,
+                        'Start'=>$this->iso($anchorDate,self::ANCHOR_CLOCK),
+                        'Finish'=>$this->iso($anchorDate,self::ANCHOR_CLOCK),
+                        'Duration'=>'PT0H0M0S','DurationFormat'=>7,'Milestone'=>1,
+                        'Notes'=>'Source: kanboard-subtask:' . $parentId . ':' . (int)$sub['id'] .
+                            "\\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico, NAO cronograma." .
+                            "\\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0')
+                    );
+                    $xml .= "    <Task>\\n" . $this->fields($subFields,3) . "    </Task>\\n";
+                }
+            }
             foreach ($atEnd[$pos] ?? array() as $parent) {
                 if ($nextUid>2147483647) throw new \RuntimeException('No more UIDs for deadline markers');
                 $end=$this->timestampDate($byId[$parent]['date_due']);
                 $marker = array(
                     'UID'=>$nextUid++,'ID'=>$nextId++, 'Name'=>'Prazo Kanboard: '.$end,
-                    'WBS'=>$wbs[$parent].'.'.(count($children[$parent])+1),
+                    'WBS'=>$wbs[$parent].'.'.(count($children[$parent] ?? array()) + ($detailedSubtasks ? count($nativeNotes[$parent] ?? array()) : 0) + 1),
                     'OutlineLevel'=>$levels[$parent]+1,
                     'Start'=>$this->sourceIso($byId[$parent]['date_due']), 'Finish'=>$this->sourceIso($byId[$parent]['date_due']),
                     'Duration'=>'PT0H0M0S','DurationFormat'=>7,'Milestone'=>1,
