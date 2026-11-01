@@ -113,7 +113,8 @@ class ProjectXmlExporter
                 if ($date !== null && $date < $anchorDate) $anchorDate = $date;
             }
         }
-        $summary = array_fill_keys(array_keys($children), true);
+        $cardSummary = array_fill_keys(array_keys($children), true);
+        $summary = $cardSummary;
         if ($detailedSubtasks) {
             foreach (array_keys($nativeNotes) as $taskId) $summary[$taskId] = true;
         }
@@ -128,7 +129,10 @@ class ProjectXmlExporter
         );
         foreach ($predecessors as $succ => $preds) {
             foreach ($preds as $pred => $_) {
-                if (isset($summary[$succ]) || isset($summary[$pred])) {
+                // Preserve original card-to-card blocker edges. Native-subtask rows
+                // must not silently remove a dependency that exists in legacy mode.
+                // MSPDI importers may treat promoted native-only parents as summaries.
+                if (isset($cardSummary[$succ]) || isset($cardSummary[$pred])) {
                     $notesProject[] = 'Dependencia com tarefa-resumo nao exportada: ' . $pred . ' -> ' . $succ;
                     continue;
                 }
