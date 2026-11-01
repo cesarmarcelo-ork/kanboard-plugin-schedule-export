@@ -16,7 +16,7 @@ assert "'-cronograma.xml'" in controller
 assert r'namespace Kanboard\Plugin\ScheduleExport\Controller;' in controller
 view=(base/'Template/project/dropdown.php').read_text(encoding='utf-8')
 assert "'ScheduleExportController'" in view and "'plugin' => 'ScheduleExport'" in view
-assert view.count("'ScheduleExportController'") == 1
+assert view.count("'download',\n            array('project_id'") == 1
 assert 'Exportar cronograma (.xml)' in view
 assert 'experimental' not in view
 assert "getStringParam('subtasks') !== 'legacy'" in controller
