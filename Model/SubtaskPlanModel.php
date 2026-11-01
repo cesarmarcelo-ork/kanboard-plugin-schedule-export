@@ -45,6 +45,9 @@ class SubtaskPlanModel
         $days = array_values(array_unique(array_map('intval', $days)));
         sort($days);
         if (!$days || count($days) > 7 || count(array_diff($days, range(1,7)))) throw new InvalidArgumentException('Invalid working days');
+        // Browsers may submit datetime-local as YYYY-MM-DDTHH:MM without seconds.
+        if (is_string($start) && preg_match('/^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d$/', $start)) $start .= ':00';
+        if (is_string($end) && preg_match('/^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d$/', $end)) $end .= ':00';
         if ($start === '' || $end === '') throw new InvalidArgumentException('Both dates are required');
         foreach (array($start,$end) as $value) {
             if (!is_string($value) || !preg_match('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d$/', $value)) throw new InvalidArgumentException('Invalid date syntax');
