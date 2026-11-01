@@ -31,12 +31,20 @@ ensure(strpos($legacy,'kanboard-subtask:') === false,'Legacy mode created subtas
 $detailed = $exporter->generate($project,$tasks,$links,'2026-10-26',$subtasks,true);
 ensure(strpos($detailed,'Source: kanboard-subtask:10:15') !== false,'Missing parent subtask');
 ensure(strpos($detailed,'Source: kanboard-subtask:11:16') !== false,'Missing nested subtask');
-ensure(strpos($detailed,'<WBS>1.2</WBS>') !== false,'Missing parent subtask WBS');
-ensure(strpos($detailed,'<WBS>1.1.1</WBS>') !== false,'Missing nested subtask WBS');
-ensure(strpos($detailed,'<WBS>1.3</WBS>') !== false,'Missing deadline milestone WBS');
+ensure(strpos($detailed,'<WBS>1.3</WBS>') !== false,'Missing parent subtask WBS');
+ensure(strpos($detailed,'<WBS>1.1.2</WBS>') !== false,'Missing nested subtask WBS');
+ensure(strpos($detailed,'<WBS>1.4</WBS>') !== false,'Missing deadline milestone WBS');
 ensure(strpos($detailed,'Source: kanboard-subtask:20:17') !== false,'Missing native-only parent subtask');
-ensure(strpos($detailed,'<WBS>2.1</WBS>') !== false,'Missing native-only WBS');
-ensure(strpos($detailed,'<WBS>2.2</WBS>') !== false,'Missing native-only deadline milestone');
+ensure(strpos($detailed,'Source: kanboard-card-period:1:10') !== false,'Missing own bar of parent with child cards');
+ensure(strpos($detailed,'Source: kanboard-card-period:1:11') !== false,'Missing own bar of child card with subtasks');
+ensure(strpos($detailed,'Source: kanboard-card-period:1:20') !== false,'Missing own bar of card with only subtasks');
+ensure(strpos($legacy,'kanboard-card-period:') === false,'Legacy mode must not introduce synthetic own bars');
+ensure(substr_count($detailed,'<Name>Periodo do cartao: ') === 3,'Expected own bar for all three summary cards');
+ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>Periodo do cartao: Native only</Name>(?:(?!</Task>).)*<Start>2026-10-27T09:00:00</Start>(?:(?!</Task>).)*<Finish>2026-10-29T17:00:00</Finish>(?:(?!</Task>).)*<Milestone>0</Milestone>(?:(?!</Task>).)*</Task>~s',$detailed),'Native-only card lost its own planned bar');
+ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<UID>20</UID>(?:(?!</Task>).)*<Name>Native only</Name>(?:(?!</Task>).)*</Task>~s',$detailed),'Original card UID must remain visible');
+
+ensure(strpos($detailed,'<WBS>2.2</WBS>') !== false,'Missing native-only WBS');
+ensure(strpos($detailed,'<WBS>2.3</WBS>') !== false,'Missing native-only deadline milestone');
 ensure(strpos($detailed,'<Start>2026-10-27T09:00:00</Start>') !== false,'Explicit subtask start missing');
 ensure(strpos($detailed,'<Finish>2026-10-29T17:00:00</Finish>') !== false,'Explicit subtask finish missing');
 ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>No child cards</Name>(?:(?!</Task>).)*<Milestone>0</Milestone>(?:(?!</Task>).)*</Task>~s', $detailed),'Period subtask should show Gantt bar');
