@@ -67,9 +67,7 @@ class PlannedSubtaskConversionModel extends NativeConversion
         // Preserve the source plan's additional scheduling parameters for audit.
         // They do not change native time_estimated/time_spent or task dates.
         if ($plan) {
-            $this->taskMetadataModel->save($task_id, 'schedule_export_source_subtask_id', (string) $subtask_id);
-            $this->taskMetadataModel->save($task_id, 'schedule_export_workday_minutes', (string) $plan['workday_minutes']);
-            $this->taskMetadataModel->save($task_id, 'schedule_export_workdays', (string) $plan['workdays']);
+            $this->taskMetadataModel->save($task_id, array('schedule_export_source_subtask_id' => (string) $subtask_id, 'schedule_export_workday_minutes' => (string) $plan['workday_minutes'], 'schedule_export_workdays' => (string) $plan['workdays']));
         }
 
         $link = $this->linkModel->getByLabel('is a child of');
