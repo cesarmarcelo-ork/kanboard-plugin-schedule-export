@@ -244,9 +244,13 @@ class ProjectXmlExporter
                 $xml .= "      </PredecessorLink>\n";
             }
             $xml .= "    </Task>\n";
-            foreach ($subAtEnd[$pos] ?? array() as $parentId) {
+            $closingOwners = array_unique(array_merge(array_keys(array_fill_keys($subAtEnd[$pos] ?? array(), true)), array_keys(array_fill_keys($atEnd[$pos] ?? array(), true))));
+            usort($closingOwners, function ($a, $b) use ($levels) { return $levels[$b] <=> $levels[$a]; });
+            foreach ($closingOwners as $closingOwner) {
+            if (in_array($closingOwner, $subAtEnd[$pos] ?? array(), true)) {
+                $parentId = $closingOwner;
                 foreach ($nativeNotes[$parentId] as $subIndex => $sub) {
-                    if ($nextUid > 2147483647) throw new \\RuntimeException('No more UIDs for native subtasks');
+                    if ($nextUid > 2147483647) throw new \RuntimeException('No more UIDs for native subtasks');
                     $number = count($children[$parentId] ?? array()) + $subIndex + 1;
                     $subName = (string) ($sub['title'] ?? ('Subtask ' . $sub['id']));
                     $subFields = array(
@@ -258,13 +262,14 @@ class ProjectXmlExporter
                         'Finish'=>$this->iso($anchorDate,self::ANCHOR_CLOCK),
                         'Duration'=>'PT0H0M0S','DurationFormat'=>7,'Milestone'=>1,
                         'Notes'=>'Source: kanboard-subtask:' . $parentId . ':' . (int)$sub['id'] .
-                            "\\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico, NAO cronograma." .
-                            "\\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0')
+                            "\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico, NAO cronograma." .
+                            "\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0')
                     );
-                    $xml .= "    <Task>\\n" . $this->fields($subFields,3) . "    </Task>\\n";
+                    $xml .= "    <Task>\n" . $this->fields($subFields,3) . "    </Task>\n";
                 }
             }
-            foreach ($atEnd[$pos] ?? array() as $parent) {
+            if (in_array($closingOwner, $atEnd[$pos] ?? array(), true)) {
+                $parent = $closingOwner;
                 if ($nextUid>2147483647) throw new \RuntimeException('No more UIDs for deadline markers');
                 $end=$this->timestampDate($byId[$parent]['date_due']);
                 $marker = array(
@@ -278,6 +283,7 @@ class ProjectXmlExporter
                         "\nCalendario 24 horas preserva o instante do prazo; marcos auxiliares nao representam trabalho.",
                 );
                 $xml .= "    <Task>\n" . $this->fields($marker,3) . "    </Task>\n";
+            }
             }
         }
         return $xml . "  </Tasks>\n</Project>\n";
