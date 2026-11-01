@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+*.pod
+*.mpp
+*.xml
+!tests/*.example.xml
+.env
+.env.*

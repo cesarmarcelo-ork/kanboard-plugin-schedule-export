@@ -1,27 +1,32 @@
 # Kanboard Schedule Export
 
-Read-only Kanboard plugin that exports project schedules as **Microsoft Project XML (MSPDI)**. The XML can be opened in compatible scheduling applications; interpretation depends on importer handling of calendars, durations and milestones.
+[![Kanboard plugin](https://img.shields.io/badge/Kanboard-plugin-informational)](https://kanboard.org/)
 
-**Current version:** `0.2.0-rc1` (release candidate).
+Read-only Kanboard plugin that exports project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
 
-**Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, task descriptions/subtask estimates, and save/reopen persistence. Complete CPM/workload equivalence has not been established.
+**Current version:** `0.2.0-rc1` (release candidate). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Full CPM/workload equivalence across applications has not been established.
 
-## Usage
+## Use
 
-1. Install as `plugins/ScheduleExport` in Kanboard. Do **not** run the old `ProjectLibreExport` plugin alongside it.
-2. Open a project you are authorized to view and choose **Exportar cronograma (.xml)**.
+1. Install this repository as `plugins/ScheduleExport` in your Kanboard instance. **Do not install it alongside** the older `ProjectLibreExport` plugin.
+2. Open an authorized Kanboard project and select **Exportar cronograma (.xml)** from its project menu.
 3. Open the downloaded `kanboard-PROJECT_ID-cronograma.xml` in an MSPDI-compatible application.
 
-The plugin is read-only: it does not change Kanboard tasks or require a personal API token.
+No personal API token or browser extension is required. The plugin reads Kanboard project data but does not update tasks, use external services, or alter the database.
 
-## Data conventions
+## Data representation
 
-- Original dates, times and estimates come from Kanboard.
-- The export preserves task relationships as an EAP/WBS and uses a 24/7 calendar, including weekend deadlines.
-- Only-due tasks become milestones; undated cards are explicitly identified. Native subtasks without dates are kept in descriptions, not fabricated as scheduled work.
-- Work estimates are separate from Gantt `Duration`. The latter contains a ProjectLibre 1.9.8 compatibility adjustment that other importers may interpret differently.
-- CPM/critical-path results should not be treated as validated without explicit precedence relationships.
+- The Kanboard database is authoritative for the original dates and hours, estimated work, task relationships, and native subtasks.
+- Original datetimes are preserved in XML task fields when provided and in the task description; a special 24/7 calendar permits weekend deadlines.
+- Tasks with only a due date become milestones; fully undated tasks are explicitly labeled as unscheduled. These placements are not invented work schedules.
+- Card parent/child links form the work breakdown structure (WBS/EAP). Native checklist subtasks without dates are retained in parent task descriptions, *not* fabricated Gantt bars.
+- Work estimates are separate from the Gantt `Duration` field. The latter includes a ProjectLibre 1.9.8 compatibility adjustment that other importers may interpret differently.
+- Importer-calculated critical path is **not** authoritative without genuine task precedence links.
 
-Additional project documentation and offline tests will be added from the validated source package. Do **not** commit user project snapshots, IFC data, credentials, or server backups.
+## Quality and installation
 
-Maintained by OrkFlowTech · MIT License.
+See [README-PTBR.md](README-PTBR.md) for Brazilian Portuguese details, [MIGRACAO.md](MIGRACAO.md) for version migration, and [HOMOLOGACAO-OPS.md](HOMOLOGACAO-OPS.md) for OPS verification.
+
+The test suite lives in `tests/`; GitHub Actions runs PHP lint, XML parsing, synthetic scenario tests, and plugin-identity checks. Private user project exports, credentials, server backups, and IFC files are **not part of this repository**.
+
+License: MIT. Maintained by OrkFlowTech.

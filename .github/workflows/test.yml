@@ -1,0 +1,32 @@
+name: Validate Kanboard Schedule Export
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.1', '8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: PHP syntax
+        run: find . -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Export fixture
+        run: php tests/smoke.php
+      - name: Validate MSPDI XML
+        run: python tests/verify_xml.py
+      - name: Regression matrix (source timestamps, missing dates, EAP, blockers)
+        run: |
+          OUT="$(mktemp -d)"
+          trap 'rm -rf "$OUT"' EXIT
+          php tests/test_matrix.php "$OUT"
+          python3 tests/verify_matrix.py "$OUT"
+      - name: Verify renamed plugin wiring
+        run: python3 tests/verify_plugin_rename.py
