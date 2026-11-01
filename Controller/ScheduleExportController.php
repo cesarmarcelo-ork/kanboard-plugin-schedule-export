@@ -35,7 +35,8 @@ class ScheduleExportController extends BaseController
         }
 
         $exporter = new ProjectXmlExporter($this->timezoneModel->getCurrentTimezone());
-        $detailed = $this->request->getStringParam('subtasks') === 'detailed';
+        // Detailed export is the default. Legacy format remains available via ?subtasks=legacy.
+        $detailed = $this->request->getStringParam('subtasks') !== 'legacy';
         $plans = $detailed ? (new SubtaskPlanModel($this->db->getConnection()))->getByTaskIds(array_keys($knownIds)) : array();
         $xml = $exporter->generate($project, $tasks, $links, null, $subtasksByTask, $detailed, $plans);
         $filename = 'kanboard-' . $projectId . ($detailed ? '-subtarefas' : '') . '-cronograma.xml';
