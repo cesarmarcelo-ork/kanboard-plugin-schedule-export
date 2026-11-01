@@ -1,4 +1,4 @@
-# Kanboard Schedule Export — v0.4.1-rc1 (candidata de teste)
+# Kanboard Schedule Export — v0.4.1 (estável)
 
 Plugin de **planejamento de subtarefas e exportação** de projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
 
@@ -41,7 +41,7 @@ python3 tests/verify_source_snapshot.py /caminho/snapshot.json /tmp/kanboard-cro
 
 Veja **`MIGRACAO.md`** e **`HOMOLOGACAO-OPS.md`**.
 
-**Versão em desenvolvimento:** 0.4.1-rc1; não substituir a instalação estável 0.4.0 sem testes. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
+**Versão estável:** 0.4.1; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
 
 
 ## Correção candidata v0.4.1
