@@ -26,8 +26,9 @@ nativeAssert($row['planned_start']==='2026-11-02T09:00:00','Start not persisted'
 nativeAssert($row['planned_end']==='2026-11-04T17:00:00','Finish not persisted');
 nativeAssert($row['workdays']==='1,2,3,4,5','Workdays not persisted');
 nativeAssert(count($model->getByTaskIds(array(10)))===1,'Project plans not readable');
-$model->save(1,10,100,'2026-11-03T09:00:00','2026-11-04T17:00:00',360,array(2,3,4),7);
+$model->save(1,10,100,'2026-11-03T09:00','2026-11-04T17:00',360,array(2,3,4),7);
 nativeAssert($model->get(100)['workday_minutes']==360,'Update failed');
+nativeAssert($model->get(100)['planned_start']==='2026-11-03T09:00:00','Browser datetime-local precision failed');
 foreach (array(
  array(2,10,100,'2026-11-03T09:00:00','2026-11-04T17:00:00'),
  array(1,10,200,'2026-11-03T09:00:00','2026-11-04T17:00:00'),
