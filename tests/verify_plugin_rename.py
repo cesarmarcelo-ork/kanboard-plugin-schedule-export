@@ -9,7 +9,7 @@ assert r'namespace Kanboard\Plugin\ScheduleExport;' in plugin
 assert "'ScheduleExport:project/dropdown'" in plugin
 assert "'ScheduleExportController', 'download'" in plugin
 assert "return 'Kanboard Schedule Export';" in plugin
-assert "return '0.4.0-dev';" in plugin
+assert "return '0.4.0-rc1';" in plugin
 controller=(base/'Controller/ScheduleExportController.php').read_text(encoding='utf-8')
 assert 'class ScheduleExportController' in controller
 assert "'-cronograma.xml'" in controller
