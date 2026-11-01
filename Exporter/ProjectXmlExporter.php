@@ -190,7 +190,7 @@ class ProjectXmlExporter
             if (!$hasStart) $issues[]='Data de inicio NAO CADASTRADA no Kanboard.';
             if (!$hasDue) $issues[]='Prazo final NAO CADASTRADO no Kanboard.';
             if ($isSummary && $hasDue) {
-                foreach ($children[$id] as $childId) {
+                foreach ($children[$id] ?? array() as $childId) {
                     $childDue=$this->timestampDate($byId[$childId]['date_due'] ?? 0);
                     if ($childDue !== null && $childDue > $due) {
                         $issues[]='CONFLITO NA ORIGEM: filho Kanboard #'.$childId.' vence em '.$childDue.' depois do pai ('.$due.').';
