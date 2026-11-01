@@ -12,8 +12,8 @@ $project = array('id'=>1,'name'=>'EAP regression');
 $tasks = array(
     array('id'=>10,'project_id'=>1,'title'=>'Parent','position'=>1,'date_started'=>$day,'date_due'=>$day+86400,'time_estimated'=>4),
     array('id'=>11,'project_id'=>1,'title'=>'Child','position'=>2,'date_started'=>$day,'date_due'=>$day+3600,'time_estimated'=>1),
-    array('id'=>20,'project_id'=>1,'title'=>'Native only','position'=>3,'date_started'=>$day,'date_due'=>$day+86400,'time_estimated'=>3,'description'=>'[SE_SUBTASK_PERIOD id=17 start=2026-10-27T09:00:00 end=2026-10-29T17:00:00]'),
-    array('id'=>30,'project_id'=>1,'title'=>'After Native','position'=>4,'date_started'=>$day+86400,'date_due'=>$day+2*86400,'time_estimated'=>2),
+    array('id'=>20,'project_id'=>1,'title'=>'Native only','position'=>3,'date_started'=>strtotime('2026-10-27 09:00:00 UTC'),'date_due'=>strtotime('2026-10-29 17:00:00 UTC'),'time_estimated'=>3,'description'=>'[SE_SUBTASK_PERIOD id=17 start=2026-10-27T09:00:00 end=2026-10-29T17:00:00]'),
+    array('id'=>30,'project_id'=>1,'title'=>'After Native','position'=>4,'date_started'=>strtotime('2026-10-29 18:00:00 UTC'),'date_due'=>strtotime('2026-10-30 18:00:00 UTC'),'time_estimated'=>2),
 );
 $links = array(
     10=>array(array('task_id'=>11,'label'=>'is a parent of')),
