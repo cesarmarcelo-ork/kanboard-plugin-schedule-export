@@ -41,7 +41,7 @@ ensure(strpos($detailed,'Source: kanboard-card-period:1:10') !== false,'Missing 
 ensure(strpos($detailed,'Source: kanboard-card-period:1:11') !== false,'Missing own bar of child card with subtasks');
 ensure(strpos($detailed,'Source: kanboard-card-period:1:20') !== false,'Missing own bar of card with only subtasks');
 ensure(strpos($detailed,'Source: kanboard-card-period:1:40') !== false,'Missing own bar of card with undated subtasks');
-ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>Undated native \[SEM DATAS — NAO PLANEJADA\]</Name>(?:(?!</Task>).)*<Start>2026-11-10T10:00:00</Start>(?:(?!</Task>).)*<Milestone>1</Milestone>(?:(?!</Task>).)*</Task>~s',$detailed),'Technical subtask milestone should be anchored at card start, not earliest project date');
+ensure((bool)preg_match('~<Task>(?:(?!</Task>).)*<Name>Undated native \[SEM DATAS — NAO PLANEJADA\]</Name>(?:(?!</Task>).)*<Start>2026-11-10T10:00:00</Start>(?:(?!</Task>).)*<Milestone>0</Milestone>(?:(?!</Task>).)*</Task>~s',$detailed),'Undated subtask must be a zero-duration non-milestone task anchored at card start');
 
 ensure(strpos($legacy,'kanboard-card-period:') === false,'Legacy mode must not introduce synthetic own bars');
 ensure(substr_count($detailed,'<Name>Periodo do cartao: ') === 4,'Expected own bar for all four summary cards');
