@@ -30,3 +30,12 @@ jobs:
           python3 tests/verify_matrix.py "$OUT"
       - name: Verify renamed plugin wiring
         run: python3 tests/verify_plugin_rename.py
+      - name: Verify experimental native-subtask WBS and legacy regression
+        run: php tests/test_subtasks_v030.php
+      - name: Upload synthetic v0.3.0 MSPDI sample for ProjectLibre review
+        if: ${{ matrix.php == '8.4' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: schedule-export-v030-projectlibre-sample
+          path: tests/fixture_v030.xml
+          if-no-files-found: error
