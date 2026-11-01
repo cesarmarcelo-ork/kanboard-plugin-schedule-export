@@ -22,6 +22,7 @@ Esta funcionalidade **não altera** a exportação padrão `Exportar cronograma 
 - **Início e fim devem ser válidos; o fim deve ser posterior ao início.**
 - Data inexistente, ID de subtarefa não pertencente ao cartão, linha malformada e declaração duplicada geram erro explícito, sem criar períodos presumidos.
 - Subtarefas nativas **sem** linha de período aparecem como marcos técnicos `SEM DATAS — NAO PLANEJADA`, não como barras fictícias.
+- O marco técnico de subtarefa sem datas é ancorado visualmente no início do cartão, se disponível; caso contrário, no prazo, e por último na âncora global. Isso **não** define início real para a subtarefa e busca evitar que um marco antigo distorça a barra-resumo do cartão.
 - O período explícito é tratado como **janela de calendário**. `time_estimated` permanece uma estimativa de esforço separada.
 - A opção experimental não depende da extensão K-OrkFlowTech, não cria campos no banco, não escreve no Kanboard e não modifica as datas de origem.
 - **Todo cartão permanece no XML com seu próprio UID, título e hierarquia**, mesmo tendo cartões-filhos, subtarefas nativas ou ambos.
