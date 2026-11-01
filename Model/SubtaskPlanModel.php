@@ -67,4 +67,12 @@ class SubtaskPlanModel
             $q->execute(array($subtaskId,$taskId,$projectId,$start,$end,$workdayMinutes,implode(',',$days),$now,$userId));
         }
     }
+    public function delete($projectId, $taskId, $subtaskId)
+    {
+        $q = $this->pdo->prepare(
+            'DELETE FROM schedule_export_subtask_plans WHERE project_id = ? AND task_id = ? AND subtask_id = ?'
+        );
+        return $q->execute(array((int)$projectId,(int)$taskId,(int)$subtaskId));
+    }
+
 }
