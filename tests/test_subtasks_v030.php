@@ -67,4 +67,6 @@ foreach ($invalidDescriptions as $badDescription) {
         // Invalid declarations fail explicitly; no silent inferred bar.
     }
 }
+// Synthetic, non-sensitive MSPDI sample for manual import in ProjectLibre/OPS.
+file_put_contents(__DIR__ . '/fixture_v030.xml', $detailed);
 echo "PASS: v0.3.0 legacy and detailed WBS regression\n";
