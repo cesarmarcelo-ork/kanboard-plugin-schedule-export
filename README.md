@@ -4,7 +4,7 @@
 
 Read-only Kanboard plugin that exports project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
 
-**Current version:** `0.2.0` (stable). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
+**Current version:** `0.4.0` (stable). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
 
 ## Use
 
@@ -30,3 +30,8 @@ See [README-PTBR.md](README-PTBR.md) for Brazilian Portuguese details, [MIGRACAO
 The test suite lives in `tests/`; GitHub Actions runs PHP lint, XML parsing, synthetic scenario tests, and plugin-identity checks. Private user project exports, credentials, server backups, and IFC files are **not part of this repository**.
 
 License: MIT. Maintained by OrkFlowTech.
+
+
+## Novidades da v0.4.0
+
+A exportação XML detalhada é o padrão em uma única entrada no menu. Subtarefas nativas podem ter períodos cadastrados no Kanboard pela coluna **Planejamento / Datas**, sem modificar o rastreamento de tempo. O modo anterior está disponível pelo parâmetro `subtasks=legacy`. Veja [notas da versão](docs/RELEASE-V040.md) para migração, limitações visuais dos importadores e homologação.
