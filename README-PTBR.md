@@ -44,6 +44,6 @@ Veja **`MIGRACAO.md`** e **`HOMOLOGACAO-OPS.md`**.
 **Versão estável:** 0.4.1; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
 
 
-## Correção candidata v0.4.1
+## Correção v0.4.1
 
-A conversão nativa **subtarefa → tarefa** agora captura o planejamento antes de excluir a subtarefa original: copia `planned_start` para `date_started` e `planned_end` para `date_due`, sem inventar datas quando não há planejamento. Preserva as horas nativas e registra os parâmetros de jornada/dias úteis nos metadados da nova tarefa para rastreabilidade. Conversões malsucedidas não devem remover a subtarefa original. A compatibilidade e a semântica de fuso horário devem ser homologadas na instalação de teste antes da promoção para versão estável.
+A conversão nativa **subtarefa → tarefa** agora captura o planejamento antes de excluir a subtarefa original: copia `planned_start` para `date_started` e `planned_end` para `date_due`, sem inventar datas quando não há planejamento. Preserva as horas nativas e registra os parâmetros de jornada/dias úteis nos metadados da nova tarefa para rastreabilidade. Conversões malsucedidas não devem remover a subtarefa original. A transferência foi verificada em testes automatizados e funcionais na homelab; outras configurações de fuso horário e plugins que substituam o mesmo serviço de conversão requerem validação específica.
