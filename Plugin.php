@@ -15,7 +15,7 @@ class Plugin extends Base
     {
         // Replace only the native conversion service, preserving its public method contract.
         $this->container['subtaskTaskConversionModel'] = function ($container) {
-            return new \\Kanboard\\Plugin\\ScheduleExport\\Model\\PlannedSubtaskConversionModel($container);
+            return new \Kanboard\Plugin\ScheduleExport\Model\PlannedSubtaskConversionModel($container);
         };
 
         $this->projectAccessMap->add('ScheduleExportController', 'download', Role::PROJECT_VIEWER);
