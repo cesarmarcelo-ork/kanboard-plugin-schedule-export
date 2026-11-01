@@ -202,6 +202,22 @@ class ProjectXmlExporter
                 $subAtEnd[$last][] = $id;
             }
         }
+        // A card remains a real Kanboard card (UID = card ID). For summary
+        // cards, an additional read-only row preserves the card's OWN period
+        // even if an MSPDI importer recalculates the summary bar from children.
+        // Only a real Kanboard start can produce this row; without a finish it
+        // is a START milestone, never a fabricated duration.
+        $ownAtEnd = array();
+        $ownPeriodRow = array();
+        if ($detailedSubtasks) {
+            foreach ($ordered as $pos => $id) {
+                if (!isset($summary[$id]) || $this->timestampDate($byId[$id]['date_started'] ?? 0) === null) continue;
+                $last = $pos;
+                for ($j=$pos+1; $j<count($ordered) && $levels[$ordered[$j]] > $levels[$id]; $j++) $last=$j;
+                $ownAtEnd[$last][] = $id;
+                $ownPeriodRow[$id] = true;
+            }
+        }
         foreach ($atEnd as &$closing) usort($closing,function($a,$b) use($levels){return $levels[$b] <=> $levels[$a];});
         unset($closing);
         $nextUid = $ids ? max($ids)+1 : 1;
@@ -244,7 +260,8 @@ class ProjectXmlExporter
             $notes .= "\nOriginal Kanboard due: " . $this->rawDate($task['date_due'] ?? 0);
             $notes .= "\nEstimated effort Kanboard (hours): " . (string) ($task['time_estimated'] ?? '0');
             $notes .= "\nHorarios XML: os originais quando cadastrados. Calendario 24h/7 dias; duracao XML com compatibilidade ProjectLibre 1.9.8 (verificar em outros importadores). Nao equivale a estimativa de trabalho.";
-            if ($isSummary) $notes .= "\nTarefa-resumo: o aplicativo de planejamento pode calcular a barra pelos filhos; o prazo original aparece em marco auxiliar.";
+            if ($isSummary) $notes .= "\nTarefa-resumo: o aplicativo de planejamento pode calcular a barra pelos filhos; o prazo original aparece em marco auxiliar." .
+                ($detailedSubtasks && isset($ownPeriodRow[$id]) ? "\nO periodo original do cartao aparece tambem numa linha auxiliar propria, distinta das subtarefas." : "");
             if (isset($nativeNotes[$id])) {
                 $notes .= "\nSubtarefas Kanboard, sem datas proprias (nao foram agendadas artificialmente):";
                 foreach ($nativeNotes[$id] as $sub) {
@@ -276,14 +293,41 @@ class ProjectXmlExporter
                 $xml .= "      </PredecessorLink>\n";
             }
             $xml .= "    </Task>\n";
-            $closingOwners = array_unique(array_merge(array_keys(array_fill_keys($subAtEnd[$pos] ?? array(), true)), array_keys(array_fill_keys($atEnd[$pos] ?? array(), true))));
+            $closingOwners = array_unique(array_merge($ownAtEnd[$pos] ?? array(), $subAtEnd[$pos] ?? array(), $atEnd[$pos] ?? array()));
             usort($closingOwners, function ($a, $b) use ($levels) { return $levels[$b] <=> $levels[$a]; });
             foreach ($closingOwners as $closingOwner) {
+            // The card's own period is never inferred from native subtasks.
+            // It is displayed as a direct child because MSPDI summary tasks
+            // do not have an independently schedulable execution bar.
+            if (in_array($closingOwner, $ownAtEnd[$pos] ?? array(), true)) {
+                if ($nextUid > 2147483647) throw new \RuntimeException('No more UIDs for card period rows');
+                $ownTask = $byId[$closingOwner];
+                $ownStart = $this->sourceIso($ownTask['date_started']);
+                $ownFinish = $this->sourceIso($ownTask['date_due'] ?? 0);
+                $ownHasPeriod = $ownFinish !== null;
+                $ownFields = array(
+                    'UID'=>$nextUid++, 'ID'=>$nextId++,
+                    'Name'=>($ownHasPeriod ? 'Periodo do cartao: ' : 'Inicio do cartao: ') . (string)($ownTask['title'] ?? ('#' . $closingOwner)),
+                    'WBS'=>$wbs[$closingOwner] . '.' . (count($children[$closingOwner] ?? array()) + 1),
+                    'OutlineLevel'=>$levels[$closingOwner] + 1,
+                    'Start'=>$ownStart,
+                    'Finish'=>$ownHasPeriod ? $ownFinish : $ownStart,
+                    'Duration'=>$ownHasPeriod ? $this->durationBetween($ownTask['date_started'], $ownTask['date_due']) : 'PT0H0M0S',
+                    'DurationFormat'=>7,
+                    'Milestone'=>$ownHasPeriod ? 0 : 1,
+                    'ConstraintType'=>2, 'ConstraintDate'=>$ownStart,
+                    'Notes'=>'Linha auxiliar de visualizacao do periodo ORIGINAL do cartao Kanboard #' . $closingOwner .
+                        "\nSource: kanboard-card-period:" . (int)$project['id'] . ':' . $closingOwner .
+                        "\nNao e um novo cartao nem uma subtarefa; nao implica duracao das subtarefas.'
+                );
+                if ($ownHasPeriod) $ownFields['Deadline'] = $ownFinish;
+                $xml .= "    <Task>\n" . $this->fields($ownFields,3) . "    </Task>\n";
+            }
             if (in_array($closingOwner, $subAtEnd[$pos] ?? array(), true)) {
                 $parentId = $closingOwner;
                 foreach ($nativeNotes[$parentId] as $subIndex => $sub) {
                     if ($nextUid > 2147483647) throw new \RuntimeException('No more UIDs for native subtasks');
-                    $number = count($children[$parentId] ?? array()) + $subIndex + 1;
+                    $number = count($children[$parentId] ?? array()) + (isset($ownPeriodRow[$parentId]) ? 1 : 0) + $subIndex + 1;
                     $subName = (string) ($sub['title'] ?? ('Subtask ' . $sub['id']));
                     $period = $subtaskPeriods[$parentId][(int)$sub['id']] ?? null;
                     $subStart = $period ? $this->sourceIso($period['start']) : $this->iso($anchorDate,self::ANCHOR_CLOCK);
@@ -316,7 +360,7 @@ class ProjectXmlExporter
                 $end=$this->timestampDate($byId[$parent]['date_due']);
                 $marker = array(
                     'UID'=>$nextUid++,'ID'=>$nextId++, 'Name'=>'Prazo Kanboard: '.$end,
-                    'WBS'=>$wbs[$parent].'.'.(count($children[$parent] ?? array()) + ($detailedSubtasks ? count($nativeNotes[$parent] ?? array()) : 0) + 1),
+                    'WBS'=>$wbs[$parent].'.'.(count($children[$parent] ?? array()) + (isset($ownPeriodRow[$parent]) ? 1 : 0) + ($detailedSubtasks ? count($nativeNotes[$parent] ?? array()) : 0) + 1),
                     'OutlineLevel'=>$levels[$parent]+1,
                     'Start'=>$this->sourceIso($byId[$parent]['date_due']), 'Finish'=>$this->sourceIso($byId[$parent]['date_due']),
                     'Duration'=>'PT0H0M0S','DurationFormat'=>7,'Milestone'=>1,
