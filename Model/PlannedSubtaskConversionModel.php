@@ -51,8 +51,8 @@ class PlannedSubtaskConversionModel extends NativeConversion
             // Use the application's configured local timezone for datetime-local values.
             $timezone = new DateTimeZone(date_default_timezone_get());
             foreach (array('planned_start' => 'date_started', 'planned_end' => 'date_due') as $source => $target) {
-                $date = DateTimeImmutable::createFromFormat('!Y-m-d\\TH:i:s', $plan[$source], $timezone);
-                if (! $date || $date->format('Y-m-d\\TH:i:s') !== $plan[$source]) {
+                $date = DateTimeImmutable::createFromFormat('!Y-m-d\TH:i:s', $plan[$source], $timezone);
+                if (! $date || $date->format('Y-m-d\TH:i:s') !== $plan[$source]) {
                     return false; // Never discard a plan with invalid timestamps.
                 }
                 $values[$target] = (string) $date->getTimestamp();
