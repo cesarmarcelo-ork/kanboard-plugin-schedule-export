@@ -4,7 +4,7 @@
 
 Read-only Kanboard plugin that exports project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
 
-**Current version:** `0.2.0-rc1` (release candidate). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Full CPM/workload equivalence across applications has not been established.
+**Current version:** `0.2.0` (stable). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
 
 ## Use
 

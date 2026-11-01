@@ -1,4 +1,4 @@
-# Migration — ProjectLibreExport 0.1.4-rc2 → ScheduleExport 0.2.0-rc1
+# Migration — ProjectLibreExport 0.1.4-rc2 → ScheduleExport 0.2.0
 
 This is **not** a parallel add-on. Kanboard discovers installed plugins by directory and PHP namespace.
 
@@ -11,3 +11,7 @@ This is **not** a parallel add-on. Kanboard discovers installed plugins by direc
 Do not delete unrelated plugins. Do not modify Docker Compose or bridge v0.9. Do not upload the K-ExportImport snapshot or IFC content to a public GitHub repository.
 
 **Rollback**: Move new `ScheduleExport` out of `plugins/`, restore backed-up `ProjectLibreExport` to `plugins/`, and refresh Kanboard. A PHP opcache/reload may be required for a long-lived process, depending on runtime configuration; only restart the service if the plugin is not detected after refresh.
+
+## Upgrade from ScheduleExport 0.2.0-rc1 to 0.2.0
+
+If the release candidate is already installed, **do not reinstall ProjectLibreExport**. The stable release retains the `ScheduleExport` plugin directory and behavior. Back up the current `ScheduleExport` directory, replace only its plugin files with the stable ZIP's `ScheduleExport/` contents, and verify the plugin version and an export before removing the backup. This documentation does **not** imply that the production homelab has been upgraded; the source stable release and production installation are separate steps.

@@ -42,12 +42,12 @@ class Plugin extends Base
 
     public function getPluginVersion()
     {
-        return '0.2.0-rc1';
+        return '0.2.0';
     }
 
     public function getPluginHomepage()
     {
-        return 'https://github.com/cesarmarcelo-ork';
+        return 'https://github.com/cesarmarcelo-ork/kanboard-plugin-schedule-export';
     }
 
     public function getCompatibleVersion()
