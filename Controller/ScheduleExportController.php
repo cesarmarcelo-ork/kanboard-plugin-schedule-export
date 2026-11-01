@@ -34,8 +34,9 @@ class ScheduleExportController extends BaseController
         }
 
         $exporter = new ProjectXmlExporter($this->timezoneModel->getCurrentTimezone());
-        $xml = $exporter->generate($project, $tasks, $links, null, $subtasksByTask);
-        $filename = 'kanboard-' . $projectId . '-cronograma.xml';
+        $detailed = $this->request->getStringParam('subtasks') === 'detailed';
+        $xml = $exporter->generate($project, $tasks, $links, null, $subtasksByTask, $detailed);
+        $filename = 'kanboard-' . $projectId . ($detailed ? '-subtarefas' : '') . '-cronograma.xml';
         $this->response->withFileDownload($filename);
         $this->response->xml($xml);
     }
