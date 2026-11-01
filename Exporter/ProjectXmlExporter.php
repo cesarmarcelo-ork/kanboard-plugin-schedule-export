@@ -25,7 +25,7 @@ class ProjectXmlExporter
         return (new DateTimeImmutable('@' . (int)$timestamp))->setTimezone($this->timezone)->format($pattern);
     }
 
-    public function generate(array $project, array $tasks, array $linksByTask, $anchor = null, array $subtasksByTask = array(), $detailedSubtasks = false)
+    public function generate(array $project, array $tasks, array $linksByTask, $anchor = null, array $subtasksByTask = array(), $detailedSubtasks = false, array $persistedPlans = array())
     {
         $byId = array();
         foreach ($tasks as $task) {
@@ -77,6 +77,26 @@ class ProjectXmlExporter
                     }
                     $subtaskPeriods[$parentId][$subId] = array('start'=>$start,'finish'=>$finish);
                 }
+            }
+        }
+        if ($detailedSubtasks) {
+            foreach ($persistedPlans as $subId => $plan) {
+                $subId = (int)$subId;
+                $parentId = (int)($plan['task_id'] ?? 0);
+                if (!isset($subIds[$subId]) || !isset($byId[$parentId])) {
+                    throw new \InvalidArgumentException('Persisted plan references an invalid subtask');
+                }
+                $belongs = false;
+                foreach ($nativeNotes[$parentId] ?? array() as $sub) {
+                    if ((int)$sub['id'] === $subId) { $belongs = true; break; }
+                }
+                if (!$belongs || (int)($plan['project_id'] ?? 0) !== (int)$project['id']) {
+                    throw new \InvalidArgumentException('Persisted plan ownership mismatch');
+                }
+                $start = $this->parseLocalPeriodTimestamp((string)$plan['planned_start']);
+                $finish = $this->parseLocalPeriodTimestamp((string)$plan['planned_end']);
+                if ($finish <= $start) throw new \InvalidArgumentException('Invalid persisted subtask period');
+                $subtaskPeriods[$parentId][$subId] = array('start'=>$start,'finish'=>$finish);
             }
         }
         $ids = array_keys($byId);

@@ -14,6 +14,21 @@ class Plugin extends Base
     public function initialize()
     {
         $this->projectAccessMap->add('ScheduleExportController', 'download', Role::PROJECT_VIEWER);
+        $this->projectAccessMap->add('SubtaskPlanController', 'edit', Role::PROJECT_VIEWER);
+        $this->projectAccessMap->add('SubtaskPlanController', 'save', Role::PROJECT_MEMBER);
+        $this->projectAccessMap->add('SubtaskPlanController', 'remove', Role::PROJECT_MEMBER);
+        $this->template->hook->attach(
+            'template:subtask:table:header:before-timetracking',
+            'ScheduleExport:subtask/period-header'
+        );
+        $this->template->hook->attachCallable(
+            'template:subtask:table:rows',
+            'ScheduleExport:subtask/period-link',
+            function ($subtask) {
+                return array('schedule_export_project_id' =>
+                    $this->subtaskModel->getProjectId((int)$subtask['id']));
+            }
+        );
         $this->template->hook->attach(
             'template:project:dropdown',
             'ScheduleExport:project/dropdown'
@@ -42,7 +57,7 @@ class Plugin extends Base
 
     public function getPluginVersion()
     {
-        return '0.3.0-dev';
+        return '0.4.0-rc1';
     }
 
     public function getPluginHomepage()
