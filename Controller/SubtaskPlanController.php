@@ -33,6 +33,7 @@ class SubtaskPlanController extends BaseController
 
     public function save()
     {
+        $this->checkCSRFForm();
         list($task,$subtask) = $this->context();
         $values = $this->request->getValues();
         $start = trim((string)($values['planned_start'] ?? ''));
