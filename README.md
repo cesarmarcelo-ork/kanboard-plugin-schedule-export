@@ -4,7 +4,7 @@
 
 Kanboard plugin for persistent native-subtask scheduling and export of project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
 
-**Released version:** `0.4.0` (stable). **Development candidate:** `0.4.1-rc1` (not yet released). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
+**Released version:** `0.4.0` (stable). **Released stable version:** `0.4.1` (stable). **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
 
 ## Use
 
@@ -39,4 +39,4 @@ A exportação XML detalhada é o padrão em uma única entrada no menu. Subtare
 
 ## v0.4.1 conversion fix (development candidate)
 
-When Kanboard converts a native subtask into a task, its Schedule Export dates are transferred to the new task's native start/due fields before the original subtask is removed. Additional workday parameters are recorded in task metadata; native time-tracking values are left unchanged. This is a release candidate pending installation-level acceptance tests. See [v0.4.1 test plan](docs/TESTE-CONVERSAO-V041.md).
+When Kanboard converts a native subtask into a task, its Schedule Export dates are transferred to the new task's native start/due fields before the original subtask is removed. Additional workday parameters are recorded in task metadata; native time-tracking values are left unchanged. This is a release validated in the homelab. See [v0.4.1 test plan](docs/TESTE-CONVERSAO-V041.md).
