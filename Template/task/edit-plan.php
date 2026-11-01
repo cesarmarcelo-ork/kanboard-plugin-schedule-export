@@ -24,3 +24,10 @@
     <button type="submit" class="btn btn-blue">Salvar período</button>
     <?= $this->url->link('Cancelar','TaskViewController','show',array('task_id'=>$task['id'],'project_id'=>$task['project_id'])) ?>
 </form>
+
+<?php if (!empty($plan)): ?>
+<form method="post" action="<?= $this->url->href('SubtaskPlanController','remove',array('plugin'=>'ScheduleExport','project_id'=>$task['project_id'],'task_id'=>$task['id'],'subtask_id'=>$subtask['id'])) ?>">
+    <?= $this->form->csrf() ?>
+    <button type="submit" class="btn btn-red" onclick="return confirm('Remover o planejamento desta subtarefa?')">Remover planejamento</button>
+</form>
+<?php endif ?>
