@@ -51,6 +51,34 @@ class ProjectXmlExporter
                 $nativeNotes[$parentId][] = $sub;
             }
         }
+        // Only explicitly declared periods are plotted. Native Kanboard subtasks
+        // have no own start/finish fields; never derive them from parent dates.
+        $subtaskPeriods = array();
+        if ($detailedSubtasks) {
+            foreach ($byId as $parentId => $parentTask) {
+                foreach (preg_split('/\\r\\n|\\n|\\r/', (string)($parentTask['description'] ?? '')) as $line) {
+                    $line = trim($line);
+                    if (strpos($line, '[SE_SUBTASK_PERIOD') !== 0) continue;
+                    if (!preg_match('/^\\[SE_SUBTASK_PERIOD id=([1-9][0-9]*) start=([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}) end=([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})\\]$/', $line, $match)) {
+                        throw new \\InvalidArgumentException('Invalid SE_SUBTASK_PERIOD declaration on card ' . $parentId);
+                    }
+                    $subId = (int) $match[1];
+                    $found = false;
+                    foreach ($nativeNotes[$parentId] ?? array() as $sub) {
+                        if ((int) $sub['id'] === $subId) { $found = true; break; }
+                    }
+                    if (!$found || (string)$subId !== $match[1] || isset($subtaskPeriods[$parentId][$subId])) {
+                        throw new \\InvalidArgumentException('Unknown or duplicate subtask period on card ' . $parentId);
+                    }
+                    $start = $this->parseLocalPeriodTimestamp($match[2]);
+                    $finish = $this->parseLocalPeriodTimestamp($match[3]);
+                    if ($finish <= $start) {
+                        throw new \\InvalidArgumentException('Subtask period end must follow start on card ' . $parentId);
+                    }
+                    $subtaskPeriods[$parentId][$subId] = array('start'=>$start,'finish'=>$finish);
+                }
+            }
+        }
         $ids = array_keys($byId);
         usort($ids, function ($a, $b) use ($byId) {
             $cmp = (int) ($byId[$a]['position'] ?? 999999) <=> (int) ($byId[$b]['position'] ?? 999999);
@@ -257,18 +285,28 @@ class ProjectXmlExporter
                     if ($nextUid > 2147483647) throw new \RuntimeException('No more UIDs for native subtasks');
                     $number = count($children[$parentId] ?? array()) + $subIndex + 1;
                     $subName = (string) ($sub['title'] ?? ('Subtask ' . $sub['id']));
+                    $period = $subtaskPeriods[$parentId][(int)$sub['id']] ?? null;
+                    $subStart = $period ? $this->sourceIso($period['start']) : $this->iso($anchorDate,self::ANCHOR_CLOCK);
+                    $subFinish = $period ? $this->sourceIso($period['finish']) : $subStart;
                     $subFields = array(
                         'UID'=>$nextUid++, 'ID'=>$nextId++,
-                        'Name'=>$subName . ' [SEM DATAS — NAO PLANEJADA]',
+                        'Name'=>$subName . ($period ? '' : ' [SEM DATAS — NAO PLANEJADA]'),
                         'WBS'=>$wbs[$parentId] . '.' . $number,
                         'OutlineLevel'=>$levels[$parentId] + 1,
-                        'Start'=>$this->iso($anchorDate,self::ANCHOR_CLOCK),
-                        'Finish'=>$this->iso($anchorDate,self::ANCHOR_CLOCK),
-                        'Duration'=>'PT0H0M0S','DurationFormat'=>7,'Milestone'=>1,
+                        'Start'=>$subStart,
+                        'Finish'=>$subFinish,
+                        'Duration'=>$period ? $this->durationBetween($period['start'],$period['finish']) : 'PT0H0M0S',
+                        'DurationFormat'=>7,'Milestone'=>$period ? 0 : 1,
                         'Notes'=>'Source: kanboard-subtask:' . $parentId . ':' . (int)$sub['id'] .
-                            "\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico, NAO cronograma." .
+                            ($period
+                                ? "\nPeriodo explicito cadastrado na descricao do cartao Kanboard; horario local: " . $subStart . ' a ' . $subFinish . '.'
+                                : "\nSubtarefa nativa SEM DATAS PROPRIAS; marco de referencia tecnico, NAO cronograma.") .
                             "\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0')
                     );
+                    if ($period) {
+                        $subFields['ConstraintType'] = 2;
+                        $subFields['ConstraintDate'] = $subStart;
+                    }
                     $xml .= "    <Task>\n" . $this->fields($subFields,3) . "    </Task>\n";
                 }
             }
@@ -291,6 +329,15 @@ class ProjectXmlExporter
             }
         }
         return $xml . "  </Tasks>\n</Project>\n";
+    }
+
+    private function parseLocalPeriodTimestamp($iso)
+    {
+        $value = DateTimeImmutable::createFromFormat('!Y-m-d\\TH:i:s', (string)$iso, $this->timezone);
+        if (!$value || $value->format('Y-m-d\\TH:i:s') !== $iso) {
+            throw new \\InvalidArgumentException('Invalid local date/time in SE_SUBTASK_PERIOD');
+        }
+        return $value->getTimestamp();
     }
 
     private function calendarXml()
