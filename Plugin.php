@@ -16,7 +16,18 @@ class Plugin extends Base
         $this->projectAccessMap->add('ScheduleExportController', 'download', Role::PROJECT_VIEWER);
         $this->projectAccessMap->add('SubtaskPlanController', 'edit', Role::PROJECT_VIEWER);
         $this->projectAccessMap->add('SubtaskPlanController', 'save', Role::PROJECT_MEMBER);
-        $this->template->hook->attach('template:task:show:before-subtasks', 'ScheduleExport:task/planning');
+        $this->template->hook->attach(
+            'template:subtask:table:header:before-timetracking',
+            'ScheduleExport:subtask/period-header'
+        );
+        $this->template->hook->attachCallable(
+            'template:subtask:table:rows',
+            'ScheduleExport:subtask/period-link',
+            function ($subtask) {
+                return array('schedule_export_project_id' =>
+                    $this->subtaskModel->getProjectId((int)$subtask['id']));
+            }
+        );
         $this->template->hook->attach(
             'template:project:dropdown',
             'ScheduleExport:project/dropdown'
