@@ -1,10 +1,20 @@
-# Kanboard Schedule Export — v0.4.2 (candidata); v0.4.1 (estável publicada)
+# Kanboard Schedule Export — v0.5.0 (desenvolvimento); v0.4.2 (estável publicada)
 
 Plugin de **planejamento de subtarefas e exportação** de projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
 
 ## Compatibilidade com o Kanboard (próxima manutenção)
 
 Esta branch prepara a versão **0.4.2**, cuja compatibilidade mínima declarada passa a ser **Kanboard >= 1.2.50**. O responsável pelo projeto confirmou que os testes funcionais de subtarefas, conversão nativa e exportação XML no Kanboard 1.2.50 estão satisfatórios; os registros dessa execução não foram auditados independentemente neste repositório. A homologação anterior documentada em **1.2.57** permanece válida. A versão estável **0.4.1** publicada e a entrada no catálogo oficial continuam com **>=1.2.30** até a publicação de uma nova release e posterior atualização do catálogo. Ver [notas da 0.4.2](docs/RELEASE-V042.md).
+
+## Novidades em desenvolvimento na v0.5.0
+
+- **Internacionalização:** textos do plugin passam a acompanhar o idioma do Kanboard (inglês ou português brasileiro).
+- **Criação com planejamento:** o formulário nativo de inclusão de subtarefas oferece um link **Criar subtarefa com planejamento**. Esse link abre um cadastro individual com título, responsável, tempo estimado e, opcionalmente, início, término, jornada e dias de trabalho.
+- **Cadastro em lote preservado:** o cadastro nativo de várias subtarefas continua intacto. O novo formulário individual evita associar datas ao identificador errado.
+- **Persistência coordenada:** a gravação da nova subtarefa e do seu planejamento usa o ID retornado pelo Kanboard, com validação prévia das datas e rollback quando a gravação falha.
+- O editor **Datas**, a conversão em cartão e o exportador XML permanecem disponíveis.
+
+**Estado:** implementação em branch de desenvolvimento, não publicada. Exige testes e homologação no Kanboard 1.2.50 antes de nova release.
 
 ## Funcionamento
 
@@ -45,7 +55,7 @@ python3 tests/verify_source_snapshot.py /caminho/snapshot.json /tmp/kanboard-cro
 
 Veja **`MIGRACAO.md`** e **`HOMOLOGACAO-OPS.md`**.
 
-**Versão estável publicada:** 0.4.1; versão 0.4.2 em preparação; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
+**Versão estável publicada:** 0.4.2; versão 0.5.0 em desenvolvimento; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
 
 
 ## Correção v0.4.1

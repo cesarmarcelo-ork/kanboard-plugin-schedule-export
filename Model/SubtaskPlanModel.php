@@ -40,6 +40,28 @@ class SubtaskPlanModel
         $projectId = (int)$projectId; $taskId = (int)$taskId;
         $subtaskId = (int)$subtaskId; $userId = (int)$userId;
         if ($projectId < 1 || $taskId < 1 || $subtaskId < 1 || $userId < 1) throw new InvalidArgumentException('Invalid identifiers');
+        list($start, $end, $workdayMinutes, $days) = self::validateInput($start, $end, $workdayMinutes, $days);
+
+        $q = $this->pdo->prepare('SELECT s.id FROM subtasks s JOIN tasks t ON t.id = s.task_id WHERE s.id = ? AND s.task_id = ? AND t.project_id = ?');
+        $q->execute(array($subtaskId, $taskId, $projectId));
+        if (!$q->fetchColumn()) throw new InvalidArgumentException('Subtask does not belong to project/card');
+
+        $now = time();
+        $existing = $this->get($subtaskId);
+        if ($existing) {
+            $q=$this->pdo->prepare('UPDATE schedule_export_subtask_plans SET task_id=?,project_id=?,planned_start=?,planned_end=?,workday_minutes=?,workdays=?,updated_at=?,updated_by=? WHERE subtask_id=?');
+            $q->execute(array($taskId,$projectId,$start,$end,$workdayMinutes,implode(',',$days),$now,$userId,$subtaskId));
+        } else {
+            $q=$this->pdo->prepare('INSERT INTO schedule_export_subtask_plans (subtask_id,task_id,project_id,planned_start,planned_end,workday_minutes,workdays,updated_at,updated_by) VALUES (?,?,?,?,?,?,?,?,?)');
+            $q->execute(array($subtaskId,$taskId,$projectId,$start,$end,$workdayMinutes,implode(',',$days),$now,$userId));
+        }
+    }
+    /**
+     * Validate and normalize schedule fields before native subtask creation.
+     * The same constraints are reused by save(), preventing partial creations.
+     */
+    public static function validateInput($start, $end, $workdayMinutes, array $days)
+    {
         $workdayMinutes = (int)$workdayMinutes;
         if ($workdayMinutes < 1 || $workdayMinutes > 1440) throw new InvalidArgumentException('Invalid workday minutes');
         $days = array_values(array_unique(array_map('intval', $days)));
@@ -56,20 +78,9 @@ class SubtaskPlanModel
         }
         if (strcmp($end, $start) <= 0) throw new InvalidArgumentException('End must be after start');
 
-        $q = $this->pdo->prepare('SELECT s.id FROM subtasks s JOIN tasks t ON t.id = s.task_id WHERE s.id = ? AND s.task_id = ? AND t.project_id = ?');
-        $q->execute(array($subtaskId, $taskId, $projectId));
-        if (!$q->fetchColumn()) throw new InvalidArgumentException('Subtask does not belong to project/card');
-
-        $now = time();
-        $existing = $this->get($subtaskId);
-        if ($existing) {
-            $q=$this->pdo->prepare('UPDATE schedule_export_subtask_plans SET task_id=?,project_id=?,planned_start=?,planned_end=?,workday_minutes=?,workdays=?,updated_at=?,updated_by=? WHERE subtask_id=?');
-            $q->execute(array($taskId,$projectId,$start,$end,$workdayMinutes,implode(',',$days),$now,$userId,$subtaskId));
-        } else {
-            $q=$this->pdo->prepare('INSERT INTO schedule_export_subtask_plans (subtask_id,task_id,project_id,planned_start,planned_end,workday_minutes,workdays,updated_at,updated_by) VALUES (?,?,?,?,?,?,?,?,?)');
-            $q->execute(array($subtaskId,$taskId,$projectId,$start,$end,$workdayMinutes,implode(',',$days),$now,$userId));
-        }
+        return array($start, $end, $workdayMinutes, $days);
     }
+
     public function delete($projectId, $taskId, $subtaskId)
     {
         $q = $this->pdo->prepare(

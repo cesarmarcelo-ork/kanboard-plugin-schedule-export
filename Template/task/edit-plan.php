@@ -16,49 +16,49 @@
 .schedule-plan__remove{margin:18px 0}
 @media(max-width:650px){.schedule-plan__panel{padding:14px}.schedule-plan__grid{grid-template-columns:1fr}}
 </style>
-<section class="page-header"><h2>Planejamento de subtarefa</h2></section>
+<section class="page-header"><h2><?= t('Subtask planning') ?></h2></section>
 <div class="schedule-plan">
-    <p class="schedule-plan__muted"><strong><?= $this->text->e($subtask['title']) ?></strong> · Cartão #<?= (int)$task['id'] ?> · Subtarefa #<?= (int)$subtask['id'] ?></p>
+    <p class="schedule-plan__muted"><strong><?= $this->text->e($subtask['title']) ?></strong> · <?= t('Card #%d', (int)$task['id']) ?> · <?= t('Subtask #%d', (int)$subtask['id']) ?></p>
     <form method="post" action="<?= $this->url->href('SubtaskPlanController','save',array('plugin'=>'ScheduleExport','project_id'=>$task['project_id'],'task_id'=>$task['id'],'subtask_id'=>$subtask['id'])) ?>">
         <?= $this->form->csrf() ?>
         <div class="schedule-plan__panel">
-            <h3 class="schedule-plan__heading">Período planejado</h3>
-            <p class="schedule-plan__muted">Defina o início e o término para representar esta subtarefa no Gantt do ProjectLibre.</p>
+            <h3 class="schedule-plan__heading"><?= t('Planned period') ?></h3>
+            <p class="schedule-plan__muted"><?= t('Set a start and end date so this sub-task appears in the exported Gantt chart.') ?></p>
             <div class="schedule-plan__grid">
                 <div class="schedule-plan__field">
-                    <label for="planned_start">Data e hora inicial</label>
+                    <label for="planned_start"><?= t('Planned start date and time') ?></label>
                     <input id="planned_start" name="planned_start" type="datetime-local" step="60" required value="<?= $this->text->e($plan['planned_start'] ?? '') ?>">
                 </div>
                 <div class="schedule-plan__field">
-                    <label for="planned_end">Data e hora final</label>
+                    <label for="planned_end"><?= t('Planned end date and time') ?></label>
                     <input id="planned_end" name="planned_end" type="datetime-local" step="60" required value="<?= $this->text->e($plan['planned_end'] ?? '') ?>">
                 </div>
                 <div class="schedule-plan__field">
-                    <label for="workday_minutes">Jornada diária (minutos)</label>
+                    <label for="workday_minutes"><?= t('Working day (minutes)') ?></label>
                     <input id="workday_minutes" name="workday_minutes" type="number" min="1" max="1440" step="1" required value="<?= (int)($plan['workday_minutes'] ?? 480) ?>" aria-describedby="schedule-hours-help">
-                    <small id="schedule-hours-help">Informe em minutos: 480 = 8 horas por dia.</small>
+                    <small id="schedule-hours-help"><?= t('Enter minutes: 480 = 8 hours per day.') ?></small>
                 </div>
             </div>
             <div class="schedule-plan__days">
-                <span class="schedule-plan__days-title">Dias considerados</span>
+                <span class="schedule-plan__days-title"><?= t('Working days') ?></span>
                 <div class="schedule-plan__days-row">
                     <?php $selected = explode(',', $plan['workdays'] ?? '1,2,3,4,5'); ?>
-                    <?php foreach (array(1=>'Seg',2=>'Ter',3=>'Qua',4=>'Qui',5=>'Sex',6=>'Sáb',7=>'Dom') as $n=>$name): ?>
-                        <label class="schedule-plan__day"><input type="checkbox" name="workdays[]" value="<?= $n ?>" <?= in_array((string)$n,$selected,true)?'checked':'' ?>><?= $name ?></label>
+                    <?php foreach (array(1=>'Mon',2=>'Tue',3=>'Wed',4=>'Thu',5=>'Fri',6=>'Sat',7=>'Sun') as $n=>$name): ?>
+                        <label class="schedule-plan__day"><input type="checkbox" name="workdays[]" value="<?= $n ?>" <?= in_array((string)$n,$selected,true)?'checked':'' ?>><?= t($name) ?></label>
                     <?php endforeach ?>
                 </div>
             </div>
-            <div class="schedule-plan__note">As datas são armazenadas no Kanboard. O tempo estimado e o tempo gasto das subtarefas permanecem sob controle do rastreamento nativo.</div>
+            <div class="schedule-plan__note"><?= t('Planned dates are stored in Kanboard. Native estimated and spent time are unchanged.') ?></div>
         </div>
         <div class="schedule-plan__actions">
-            <button type="submit" class="btn btn-blue">Salvar planejamento</button>
-            <?= $this->url->link('Cancelar','TaskViewController','show',array('task_id'=>$task['id'],'project_id'=>$task['project_id'])) ?>
+            <button type="submit" class="btn btn-blue"><?= t('Save planning') ?></button>
+            <?= $this->url->link(t('Cancel'),'TaskViewController','show',array('task_id'=>$task['id'],'project_id'=>$task['project_id'])) ?>
         </div>
     </form>
     <?php if (!empty($plan)): ?>
         <form class="schedule-plan__remove" method="post" action="<?= $this->url->href('SubtaskPlanController','remove',array('plugin'=>'ScheduleExport','project_id'=>$task['project_id'],'task_id'=>$task['id'],'subtask_id'=>$subtask['id'])) ?>">
             <?= $this->form->csrf() ?>
-            <button type="submit" class="btn btn-red" onclick="return confirm('Remover o planejamento desta subtarefa?')">Remover planejamento</button>
+            <button type="submit" class="btn btn-red" onclick="return confirm('<?= $this->text->e(t('Remove the planned period for this sub-task?')) ?>')"><?= t('Remove planning') ?></button>
         </form>
     <?php endif ?>
 </div>

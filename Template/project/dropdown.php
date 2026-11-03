@@ -2,7 +2,7 @@
     <li>
         <?= $this->url->icon(
             'download',
-            'Exportar cronograma (.xml)',
+            t('Export project schedule (.xml)'),
             'ScheduleExportController',
             'download',
             array('project_id' => $project['id'], 'plugin' => 'ScheduleExport')

@@ -38,6 +38,10 @@ jobs:
         run: php tests/test_subtask_conversion_v041.php
       - name: Verify v0.4 native UI wiring, access control and CSRF
         run: python3 tests/verify_v040_ui_wiring.py
+      - name: Verify v0.5.0 optional planned subtask creation
+        run: php tests/test_planned_creation_v050.php
+      - name: Verify EN/PT-BR user interface translations
+        run: python3 tests/verify_i18n_v050.py
       - name: Upload synthetic v0.3.0 MSPDI sample for ProjectLibre review
         if: ${{ matrix.php == '8.4' }}
         uses: actions/upload-artifact@v4

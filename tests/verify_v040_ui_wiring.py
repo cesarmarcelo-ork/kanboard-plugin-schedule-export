@@ -5,12 +5,20 @@ controller=(p/'Controller/SubtaskPlanController.php').read_text()
 view=(p/'Template/task/edit-plan.php').read_text()
 links=(p/'Template/subtask/period-link.php').read_text()
 exporter=(p/'Exporter/ProjectXmlExporter.php').read_text()
-assert "return '0.4.2'" in plugin
+assert "return '0.5.0'" in plugin
 assert "'template:subtask:table:header:before-timetracking'" in plugin
 assert "'template:subtask:table:rows'" in plugin
 assert "'SubtaskPlanController', 'save', Role::PROJECT_MEMBER" in plugin
 assert "'SubtaskPlanController', 'remove', Role::PROJECT_MEMBER" in plugin
 assert 'checkCSRFForm()' in controller
+creation = (p/'Controller/PlannedSubtaskCreationController.php').read_text()
+assert 'checkCSRFForm()' in creation
+assert 'subtaskValidator->validateCreation' in creation
+assert 'PlannedSubtaskCreationService' in creation
+assert 'getAssignableUsersList' in creation
+assert "template:subtask:form:create" in plugin
+assert (p/'Template/subtask/create-entry.php').is_file()
+assert (p/'Template/subtask/create-planned.php').is_file()
 assert "getTask()" in controller and "getById($subtaskId)" in controller
 assert "task['id']" in controller
 assert "layout->task(" in controller
