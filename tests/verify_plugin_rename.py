@@ -9,7 +9,7 @@ assert r'namespace Kanboard\Plugin\ScheduleExport;' in plugin
 assert "'ScheduleExport:project/dropdown'" in plugin
 assert "'ScheduleExportController', 'download'" in plugin
 assert "return 'Kanboard Schedule Export';" in plugin
-assert "return '0.4.2';" in plugin
+assert "return '0.5.0';" in plugin
 assert "return '>=1.2.50';" in plugin
 controller=(base/'Controller/ScheduleExportController.php').read_text(encoding='utf-8')
 assert 'class ScheduleExportController' in controller
@@ -18,9 +18,11 @@ assert r'namespace Kanboard\Plugin\ScheduleExport\Controller;' in controller
 view=(base/'Template/project/dropdown.php').read_text(encoding='utf-8')
 assert "'ScheduleExportController'" in view and "'plugin' => 'ScheduleExport'" in view
 assert view.count("'download',\n            array('project_id'") == 1
-assert 'Exportar cronograma (.xml)' in view
+assert "t('Export project schedule (.xml)')" in view
 assert 'experimental' not in view
 assert "getStringParam('subtasks') !== 'legacy'" in controller
+assert "'template:subtask:form:create'" in plugin
+assert "'PlannedSubtaskCreationController', 'save', Role::PROJECT_MEMBER" in plugin
 for p in base.rglob('*.php'):
     t=p.read_text(encoding='utf-8')
     assert r'Kanboard\Plugin\ProjectLibreExport' not in t, str(p)
