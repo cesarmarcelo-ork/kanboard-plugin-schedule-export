@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — planned v0.4.2
+
+- Development branch changes `getCompatibleVersion()` from `>=1.2.30` to `>=1.2.50` to retire the older baseline.
+- Functional compatibility has been verified on Kanboard 1.2.57; Kanboard 1.2.50 integration validation remains **pending** and is required before releasing v0.4.2 or updating the official catalog.
+- No functional XML export or data migration changes are included in this compatibility-only change.
+
 ## 0.2.0 — Stable (01/11/2026)
 
 - Promoted the homologated `0.2.0-rc1` to stable `0.2.0`; only plugin version/homepage metadata, tests, and documentation changed. **No exporter or controller behavior changed.**
