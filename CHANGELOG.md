@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 — development (not published)
+
+- English source labels with Brazilian Portuguese translations, following the Kanboard user's language.
+- Optional per-subtask planned dates available during individual subtask creation, via a dedicated link in the standard creation form.
+- Preserved native bulk creation and existing Dates edit workflow.
+- Shared plan input validation and coordinated native-subtask/plan persistence with rollback.
+- Added automated tests for translations, invalid planning, ownership, and rollback. Kanboard 1.2.50 live UI acceptance testing remains a release gate.
+
+
 ## 0.4.2 — release candidate (unpublished)
 
 - Raised declared minimum Kanboard compatibility from `>=1.2.30` to `>=1.2.50`.
