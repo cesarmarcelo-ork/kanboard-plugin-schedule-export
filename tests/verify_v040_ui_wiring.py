@@ -5,7 +5,7 @@ controller=(p/'Controller/SubtaskPlanController.php').read_text()
 view=(p/'Template/task/edit-plan.php').read_text()
 links=(p/'Template/subtask/period-link.php').read_text()
 exporter=(p/'Exporter/ProjectXmlExporter.php').read_text()
-assert "return '0.4.1'" in plugin
+assert "return '0.4.2'" in plugin
 assert "'template:subtask:table:header:before-timetracking'" in plugin
 assert "'template:subtask:table:rows'" in plugin
 assert "'SubtaskPlanController', 'save', Role::PROJECT_MEMBER" in plugin

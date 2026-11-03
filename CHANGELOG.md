@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2 — release candidate (unpublished)
+
+- Raised declared minimum Kanboard compatibility from `>=1.2.30` to `>=1.2.50`.
+- Project maintainer confirmed functional tests covering subtasks, native subtask-to-task conversion, and MSPDI XML export on Kanboard 1.2.50. Independent test artifacts have not been inspected; existing v1.2.57 laboratory validation remains documented.
+- Plugin metadata version bumped to `0.4.2`; the exporter implementation and data schema are unchanged.
+- Official catalog metadata must be updated only after the v0.4.2 release ZIP is published.
+
 ## 0.2.0 — Stable (01/11/2026)
 
 - Promoted the homologated `0.2.0-rc1` to stable `0.2.0`; only plugin version/homepage metadata, tests, and documentation changed. **No exporter or controller behavior changed.**
