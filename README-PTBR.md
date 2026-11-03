@@ -1,10 +1,10 @@
-# Kanboard Schedule Export — v0.4.1 (estável)
+# Kanboard Schedule Export — v0.4.2 (candidata); v0.4.1 (estável publicada)
 
 Plugin de **planejamento de subtarefas e exportação** de projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
 
 ## Compatibilidade com o Kanboard (próxima manutenção)
 
-Esta branch de desenvolvimento declara **Kanboard >= 1.2.50** como versão mínima proposta para a futura **v0.4.2**. A versão estável **0.4.1** já publicada e a entrada no catálogo oficial permanecem com **>= 1.2.30** até uma nova publicação. A homologação funcional documentada foi realizada na versão **1.2.57**; **a versão 1.2.50 ainda não foi homologada**. Antes do lançamento, validar instalação, subtarefas, conversão nativa, permissões e exportação MSPDI em laboratório independente com Kanboard 1.2.50.
+Esta branch prepara a versão **0.4.2**, cuja compatibilidade mínima declarada passa a ser **Kanboard >= 1.2.50**. O responsável pelo projeto confirmou que os testes funcionais de subtarefas, conversão nativa e exportação XML no Kanboard 1.2.50 estão satisfatórios; os registros dessa execução não foram auditados independentemente neste repositório. A homologação anterior documentada em **1.2.57** permanece válida. A versão estável **0.4.1** publicada e a entrada no catálogo oficial continuam com **>=1.2.30** até a publicação de uma nova release e posterior atualização do catálogo. Ver [notas da 0.4.2](docs/RELEASE-V042.md).
 
 ## Funcionamento
 
@@ -45,7 +45,7 @@ python3 tests/verify_source_snapshot.py /caminho/snapshot.json /tmp/kanboard-cro
 
 Veja **`MIGRACAO.md`** e **`HOMOLOGACAO-OPS.md`**.
 
-**Versão estável:** 0.4.1; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
+**Versão estável publicada:** 0.4.1; versão 0.4.2 em preparação; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
 
 
 ## Correção v0.4.1
