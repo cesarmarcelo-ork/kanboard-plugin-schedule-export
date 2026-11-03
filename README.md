@@ -6,6 +6,10 @@ Kanboard plugin for persistent native-subtask scheduling and export of project s
 
 **Current version:** `0.4.1` (stable). Previous stable: `0.4.0`. **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
 
+## Kanboard compatibility (next maintenance release)
+
+The development branch declares **Kanboard >= 1.2.50** as the proposed minimum for the next maintenance release (planned v0.4.2). The published v0.4.1 release ZIP and official directory entry still declare **>= 1.2.30**. Functional validation is documented on **Kanboard 1.2.57**; **Kanboard 1.2.50 itself has not yet been validated**. This compatibility change must not be released or advertised as tested on 1.2.50 before an independent integration test (installation, subtasks, native conversion, ACL, and MSPDI export).
+
 ## Use
 
 1. Install this repository as `plugins/ScheduleExport` in your Kanboard instance. **Do not install it alongside** the older `ProjectLibreExport` plugin.
