@@ -1,5 +1,9 @@
 <?php
 return array(
+    'Estimated start date' => 'Data inicial estimada',
+    'Estimated end date' => 'Data final estimada',
+    'Set date' => 'Definir',
+    'Not scheduled' => 'Não planejada',
     'Export project schedule (.xml)' => 'Exportar cronograma (.xml)',
     'Planning' => 'Planejamento',
     'Dates' => 'Datas',
