@@ -1,6 +1,6 @@
 <td>
 <?php if (!empty($schedule_export_project_id) && $this->user->hasProjectAccess('SubtaskPlanController','edit',$schedule_export_project_id)): ?>
-    <?= $this->url->link('Datas', 'SubtaskPlanController','edit', array(
+    <?= $this->url->link(t('Dates'), 'SubtaskPlanController','edit', array(
         'plugin'=>'ScheduleExport',
         'project_id'=>$schedule_export_project_id,
         'task_id'=>$subtask['task_id'],
