@@ -4,11 +4,11 @@
 
 Kanboard plugin for persistent native-subtask scheduling and export of project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
 
-**Current version:** `0.4.1` (stable). Previous stable: `0.4.0`. **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
+**Release candidate in this branch:** `0.4.2` (not yet published). **Current published stable:** `0.4.1`. **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
 
-## Kanboard compatibility (next maintenance release)
+## Kanboard compatibility (v0.4.2 release candidate)
 
-The development branch declares **Kanboard >= 1.2.50** as the proposed minimum for the next maintenance release (planned v0.4.2). The published v0.4.1 release ZIP and official directory entry still declare **>= 1.2.30**. Functional validation is documented on **Kanboard 1.2.57**; **Kanboard 1.2.50 itself has not yet been validated**. This compatibility change must not be released or advertised as tested on 1.2.50 before an independent integration test (installation, subtasks, native conversion, ACL, and MSPDI export).
+This branch declares **Kanboard >= 1.2.50**, replacing the previous >=1.2.30 minimum. The project maintainer confirms successful functional validation of subtasks, native subtask-to-task conversion, and MSPDI XML export on Kanboard 1.2.50; evidence from this test was not independently inspected in this repository. Prior documented laboratory validation on Kanboard **1.2.57** remains unchanged. The currently published v0.4.1 ZIP and official plugin catalog retain **>=1.2.30** until a separate v0.4.2 release and subsequent directory update. See [v0.4.2 release notes](docs/RELEASE-V042.md).
 
 ## Use
 
