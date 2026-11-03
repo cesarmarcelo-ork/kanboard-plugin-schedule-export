@@ -12,7 +12,20 @@ $container['configModel'] = new class {
     }
 };
 (new \Kanboard\ServiceProvider\HelperProvider())->register($container);
-$helper = $container['helper'];
+$helper = new class($container, $container['helper']) extends \Kanboard\Core\Helper {
+    private $realHelper;
+    public $user;
+    public $url;
+    public function __construct($container, $realHelper) {
+        parent::__construct($container);
+        $this->realHelper = $realHelper;
+    }
+    public function getHelper($name) {
+        if ($name === 'user') return $this->user;
+        if ($name === 'url') return $this->url;
+        return $this->realHelper->getHelper($name);
+    }
+};
 $helper->user = new class {
     public $edit = true;
     public function hasProjectAccess($controller, $action, $projectId) {
