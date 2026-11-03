@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased — planned v0.4.2
+## 0.4.2 — release candidate (unpublished)
 
-- Development branch changes `getCompatibleVersion()` from `>=1.2.30` to `>=1.2.50` to retire the older baseline.
-- Functional compatibility has been verified on Kanboard 1.2.57; Kanboard 1.2.50 integration validation remains **pending** and is required before releasing v0.4.2 or updating the official catalog.
-- No functional XML export or data migration changes are included in this compatibility-only change.
+- Raised declared minimum Kanboard compatibility from `>=1.2.30` to `>=1.2.50`.
+- Project maintainer confirmed functional tests covering subtasks, native subtask-to-task conversion, and MSPDI XML export on Kanboard 1.2.50. Independent test artifacts have not been inspected; existing v1.2.57 laboratory validation remains documented.
+- Plugin metadata version bumped to `0.4.2`; the exporter implementation and data schema are unchanged.
+- Official catalog metadata must be updated only after the v0.4.2 release ZIP is published.
 
 ## 0.2.0 — Stable (01/11/2026)
 
