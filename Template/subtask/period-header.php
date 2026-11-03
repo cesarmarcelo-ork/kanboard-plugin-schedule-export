@@ -1,1 +1,1 @@
-<th class="column-10">Planejamento</th>
+<th class="column-10"><?= t('Planning') ?></th>
