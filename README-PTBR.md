@@ -2,6 +2,10 @@
 
 Plugin de **planejamento de subtarefas e exportação** de projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
 
+## Compatibilidade com o Kanboard (próxima manutenção)
+
+Esta branch de desenvolvimento declara **Kanboard >= 1.2.50** como versão mínima proposta para a futura **v0.4.2**. A versão estável **0.4.1** já publicada e a entrada no catálogo oficial permanecem com **>= 1.2.30** até uma nova publicação. A homologação funcional documentada foi realizada na versão **1.2.57**; **a versão 1.2.50 ainda não foi homologada**. Antes do lançamento, validar instalação, subtarefas, conversão nativa, permissões e exportação MSPDI em laboratório independente com Kanboard 1.2.50.
+
 ## Funcionamento
 
 1. Instalar em `plugins/ScheduleExport` (veja `MIGRACAO.md` para substituir o antigo `ProjectLibreExport`).
