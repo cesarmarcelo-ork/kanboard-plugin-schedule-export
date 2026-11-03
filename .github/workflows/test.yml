@@ -3,6 +3,28 @@ on:
   push:
   pull_request:
 jobs:
+  kanboard-integration:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kanboard: ['v1.2.50', 'v1.2.57']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: gd, mbstring, dom, simplexml
+          tools: composer
+      - uses: actions/checkout@v4
+        with:
+          repository: kanboard/kanboard
+          ref: ${{ matrix.kanboard }}
+          path: .kanboard-integration
+      - name: Install Kanboard runtime dependencies
+        working-directory: .kanboard-integration
+        run: composer install --no-dev --no-interaction --prefer-dist
+      - name: Render with real Kanboard helpers
+        run: php tests/test_kanboard_date_columns.php .kanboard-integration
   test:
     runs-on: ubuntu-latest
     strategy:

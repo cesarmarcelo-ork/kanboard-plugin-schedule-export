@@ -5,11 +5,11 @@ $canEditPlan = $canViewPlan
     && $this->user->hasProjectAccess('SubtaskPlanController', 'save', $schedule_export_project_id);
 ?>
 <?php foreach (array('planned_start', 'planned_end') as $dateField): ?>
-<td class="schedule-export-date">
+<td class="schedule-export-date" style="white-space: nowrap;">
 <?php if ($canViewPlan): ?>
     <?php
     $value = $schedule_export_plan[$dateField] ?? '';
-    $label = $value !== '' ? $this->date->date($value) : ($canEditPlan ? t('Set date') : t('Not scheduled'));
+    $label = $value !== '' ? $this->dt->date($value) : ($canEditPlan ? t('Set date') : t('Not scheduled'));
     ?>
     <?php if ($canEditPlan): ?>
     <?= $this->url->link($this->text->e($label), 'SubtaskPlanController', 'edit', array(

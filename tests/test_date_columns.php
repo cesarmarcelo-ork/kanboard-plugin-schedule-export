@@ -7,7 +7,7 @@ function check($condition, $message) {
 class DateColumnView
 {
     public $user;
-    public $date;
+    public $dt;
     public $text;
     public $url;
     public function __construct($view, $edit)
@@ -19,7 +19,7 @@ class DateColumnView
                 return $action === 'save' ? $this->edit : $this->view;
             }
         };
-        $this->date = new class {
+        $this->dt = new class {
             public function date($value) { return date('d/m/Y', strtotime($value)); }
         };
         $this->text = new class {
@@ -68,4 +68,5 @@ ob_start();
 include __DIR__.'/../Template/subtask/period-header.php';
 $header = ob_get_clean();
 check(substr_count($header, '<th ') === 2 && strpos($header, 'Estimated start date') !== false && strpos($header, 'Estimated end date') !== false, 'Two matching headers');
+check(substr_count($header, 'white-space: nowrap') === 2, 'Both headers stay on one line');
 echo "PASS: date columns, saved/unscheduled rows, links, access and timezone behavior\n";
