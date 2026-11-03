@@ -6,6 +6,9 @@ root = Path(__file__).resolve().parents[1]
 locale = (root / 'Locale/pt_BR/translations.php').read_text(encoding='utf-8')
 keys = set(re.findall(r"^\s*'([^']+)'\s*=>", locale, re.M))
 views = [
+    'Template/task/edit-completion.php',
+    'Template/subtask/completion-header.php',
+    'Template/subtask/completion-link.php',
     'Template/task/edit-plan.php',
     'Template/task/planning.php',
     'Template/subtask/period-header.php',

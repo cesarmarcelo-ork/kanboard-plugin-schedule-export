@@ -24,7 +24,9 @@ jobs:
         working-directory: .kanboard-integration
         run: composer install --no-dev --no-interaction --prefer-dist
       - name: Render with real Kanboard helpers
-        run: php tests/test_kanboard_date_columns.php .kanboard-integration
+        run: |
+          php tests/test_kanboard_date_columns.php .kanboard-integration
+          php tests/test_kanboard_completion.php .kanboard-integration
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -64,6 +66,8 @@ jobs:
         run: php tests/test_planned_creation_v050.php
       - name: Verify EN/PT-BR user interface translations
         run: python3 tests/verify_i18n_v050.py
+      - name: Verify actual completion lifecycle
+        run: php tests/test_completion.php
       - name: Verify subtask date columns
         run: php tests/test_date_columns.php
       - name: Upload synthetic v0.3.0 MSPDI sample for ProjectLibre review
