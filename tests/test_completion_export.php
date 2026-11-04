@@ -56,6 +56,8 @@ $xml = (new ProjectXmlExporter('America/Sao_Paulo'))->generate(
 
 $recorded = xmlTask($xml,'kanboard-subtask:10:100');
 exportAssert((string)$recorded->Finish==='2026-11-03T17:00:00','Planned Finish was overwritten');
+exportAssert((string)$recorded->Duration==='PT57H0M0S','Elapsed duration was converted to working hours');
+exportAssert((string)$recorded->DurationFormat==='8','Elapsed-day duration format missing');
 exportAssert((string)$recorded->ActualFinish==='2026-11-03T22:30:00','ActualFinish did not use export timezone');
 exportAssert((string)$recorded->PercentComplete==='100','Completed subtask percentage missing');
 exportAssert((string)$recorded->PercentWorkComplete==='100','Completed work percentage missing');
