@@ -1,20 +1,20 @@
-# Kanboard Schedule Export — v0.5.0 (desenvolvimento); v0.4.2 (estável publicada)
+# Kanboard Schedule Export — v0.6.1
 
 Plugin de **planejamento de subtarefas e exportação** de projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
 
-## Compatibilidade com o Kanboard (próxima manutenção)
+## Compatibilidade com o Kanboard
 
-Esta branch prepara a versão **0.4.2**, cuja compatibilidade mínima declarada passa a ser **Kanboard >= 1.2.50**. O responsável pelo projeto confirmou que os testes funcionais de subtarefas, conversão nativa e exportação XML no Kanboard 1.2.50 estão satisfatórios; os registros dessa execução não foram auditados independentemente neste repositório. A homologação anterior documentada em **1.2.57** permanece válida. A versão estável **0.4.1** publicada e a entrada no catálogo oficial continuam com **>=1.2.30** até a publicação de uma nova release e posterior atualização do catálogo. Ver [notas da 0.4.2](docs/RELEASE-V042.md).
+A versão **0.6.1** requer **Kanboard >= 1.2.50**. A matriz automatizada testa Kanboard 1.2.50 e 1.2.57 com PHP 8.1–8.4; a validação funcional foi concluída no ambiente isolado 1.2.50 do notebook e na homelab. Ver [notas da 0.6.1](docs/RELEASE-V061.md).
 
-## Novidades em desenvolvimento na v0.5.0
+## Novidades da v0.6.1
 
 - **Internacionalização:** textos do plugin passam a acompanhar o idioma do Kanboard (inglês ou português brasileiro).
 - **Criação com planejamento:** o formulário nativo de inclusão de subtarefas oferece um link **Criar subtarefa com planejamento**. Esse link abre um cadastro individual com título, responsável, tempo estimado e, opcionalmente, início, término, jornada e dias de trabalho.
 - **Cadastro em lote preservado:** o cadastro nativo de várias subtarefas continua intacto. O novo formulário individual evita associar datas ao identificador errado.
 - **Persistência coordenada:** a gravação da nova subtarefa e do seu planejamento usa o ID retornado pelo Kanboard, com validação prévia das datas e rollback quando a gravação falha.
-- O editor **Datas**, a conversão em cartão e o exportador XML permanecem disponíveis.
-
-**Estado:** implementação em branch de desenvolvimento, não publicada. Exige testes e homologação no Kanboard 1.2.50 antes de nova release.
+- A tabela apresenta separadamente **Data inicial estimada**, **Data final estimada** e **Conclusão efetiva**.
+- A conclusão efetiva acompanha o estado nativo concluído/reaberto, permite correção controlada e mantém histórico.
+- O XML mantém o fim planejado em `Finish` e registra a conclusão real em `ActualFinish`, sem modificar o rastreamento de tempo nativo.
 
 ## Funcionamento
 
@@ -33,7 +33,7 @@ O plugin não exige token pessoal/API no navegador nem serviços externos. O pla
 - Relações pai/filho viram EAP; cada pai com prazo recebe um **marco auxiliar**. Cartões-pai podem mostrar duração agregada diferente do seu próprio prazo original.
 - Subtarefas nativas sem datas são exportadas explicitamente como não planejadas, com duração zero; o ProjectLibre pode desenhá-las como losangos por limitação visual.
 - Relações de duplicação são ignoradas como dependências. Conflitos nos dados originais são apontados, não corrigidos silenciosamente.
-- O campo `Duration` contém ajuste de **1 minuto por dia completo** validado com **ProjectLibre 1.9.8 Linux**; **isso não é duração estimada do Kanboard** e poderá ser interpretado diferentemente por outros aplicativos. O OPS passou no teste de importação, mas ainda requer validação independente de precisão de minutos nos campos internos e análise de caminho crítico.
+- O campo `Duration` representa o intervalo em dias corridos pelo padrão MSPDI; ProjectLibre pode exibi-lo em dias e o OPS em horas equivalentes. **Isso não é a estimativa de trabalho do Kanboard**.
 
 ## Testes offline
 
@@ -55,7 +55,7 @@ python3 tests/verify_source_snapshot.py /caminho/snapshot.json /tmp/kanboard-cro
 
 Veja **`MIGRACAO.md`** e **`HOMOLOGACAO-OPS.md`**.
 
-**Versão estável publicada:** 0.4.2; versão 0.5.0 em desenvolvimento; homologada em testes funcionais na homelab. **Estado:** validação independente em laboratório com Kanboard v1.2.57 e ZIP da Release v0.2.0-rc1 concluída (cenários A–F, exportação pelo controller HTTP e verificações MSPDI); importação OPS, hierarquia e persistência também homologadas. Equivalência completa de CPM e precisão de minutos internos no OPS permanecem fora do escopo homologado. O plugin antigo precisa ser substituído, **não instalado em paralelo**.
+**Versão:** 0.6.1. Homologada no Kanboard 1.2.50 isolado, na homelab e na matriz automatizada 1.2.50/1.2.57. Importações verificadas no ProjectLibre e no Open Planner Studio. O plugin antigo deve ser substituído, **não instalado em paralelo**.
 
 
 ## Correção v0.4.1
