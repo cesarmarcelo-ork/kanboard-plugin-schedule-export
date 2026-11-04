@@ -13,6 +13,7 @@ class ProjectXmlExporter
 {
     const NS = 'http://schemas.microsoft.com/project';
     const ANCHOR_CLOCK = '08:00:00';
+    const DURATION_FORMAT_ELAPSED_DAYS = 8;
     private $timezone;
 
     public function __construct($timezone = null)
@@ -208,7 +209,8 @@ class ProjectXmlExporter
         $xml .= $this->fields(array(
             'SaveVersion'=>14, 'Name'=>(string) ($project['name'] ?? ''), 'Title'=>(string) ($project['name'] ?? ''),
             'StartDate'=>$this->iso($anchorDate,self::ANCHOR_CLOCK),
-            'ScheduleFromStart'=>1, 'MinutesPerDay'=>1440, 'MinutesPerWeek'=>10080, 'DaysPerMonth'=>30, 'CalendarUID'=>1,
+            'ScheduleFromStart'=>1, 'MinutesPerDay'=>1440, 'MinutesPerWeek'=>10080, 'DaysPerMonth'=>30,
+            'DurationFormat'=>self::DURATION_FORMAT_ELAPSED_DAYS, 'CalendarUID'=>1,
         ),1);
         $xml .= $this->calendarXml();
         $xml .= "  <Tasks>\n";
@@ -294,7 +296,7 @@ class ProjectXmlExporter
             $notes .= "\nOriginal Kanboard start: " . $this->rawDate($task['date_started'] ?? 0);
             $notes .= "\nOriginal Kanboard due: " . $this->rawDate($task['date_due'] ?? 0);
             $notes .= "\nEstimated effort Kanboard (hours): " . (string) ($task['time_estimated'] ?? '0');
-            $notes .= "\nHorarios XML: os originais quando cadastrados. Calendario 24h/7 dias; duracao XML com compatibilidade ProjectLibre 1.9.8 (verificar em outros importadores). Nao equivale a estimativa de trabalho.";
+            $notes .= "\nHorarios XML: os originais quando cadastrados. Calendario 24h/7 dias; duracao em dias corridos (MSPDI elapsed days), sem conversao para jornadas de 8 horas. Nao equivale a estimativa de trabalho.";
             if ($isSummary) $notes .= "\nTarefa-resumo: o aplicativo de planejamento pode calcular a barra pelos filhos; o prazo original aparece em marco auxiliar." .
                 ($detailedSubtasks && isset($ownPeriodRow[$id]) ? "\nO periodo original do cartao aparece tambem numa linha auxiliar propria, distinta das subtarefas." : "");
             if (isset($nativeNotes[$id])) {
@@ -311,7 +313,7 @@ class ProjectXmlExporter
                 'UID'=>$id,'ID'=>$nextId++,'Name'=>$name,'WBS'=>$wbs[$id],'OutlineLevel'=>$levels[$id],
                 'Start'=>$startIso,
                 'Finish'=>$finishIso,
-                'Duration'=>$duration, 'DurationFormat'=>7,
+                'Duration'=>$duration, 'DurationFormat'=>self::DURATION_FORMAT_ELAPSED_DAYS,
                 'PercentComplete'=>!empty($task['date_completed']) ? 100 : 0,
                 'Milestone'=>(!$isSummary && !($hasStart && $hasDue)) ? 1 : 0,
             );
@@ -348,7 +350,7 @@ class ProjectXmlExporter
                     'Start'=>$ownStart,
                     'Finish'=>$ownHasPeriod ? $ownFinish : $ownStart,
                     'Duration'=>$ownHasPeriod ? $this->durationBetween($ownTask['date_started'], $ownTask['date_due']) : 'PT0H0M0S',
-                    'DurationFormat'=>7,
+                    'DurationFormat'=>self::DURATION_FORMAT_ELAPSED_DAYS,
                     'Milestone'=>$ownHasPeriod ? 0 : 1,
                     'ConstraintType'=>2, 'ConstraintDate'=>$ownStart,
                     'Notes'=>'Linha auxiliar de visualizacao do periodo ORIGINAL do cartao Kanboard #' . $closingOwner .
@@ -391,7 +393,7 @@ class ProjectXmlExporter
                         'Start'=>$subStart,
                         'Finish'=>$subFinish,
                         'Duration'=>$period ? $this->durationBetween($period['start'],$period['finish']) : 'PT0H0M0S',
-                        'DurationFormat'=>7,'Milestone'=>0,
+                        'DurationFormat'=>self::DURATION_FORMAT_ELAPSED_DAYS,'Milestone'=>0,
                         'PercentComplete'=>$isCompleted ? 100 : 0,
                         'PercentWorkComplete'=>$isCompleted ? 100 : 0,
                     );
@@ -418,7 +420,7 @@ class ProjectXmlExporter
                     'WBS'=>$wbs[$parent].'.'.(count($children[$parent] ?? array()) + (isset($ownPeriodRow[$parent]) ? 1 : 0) + ($detailedSubtasks ? count($nativeNotes[$parent] ?? array()) : 0) + 1),
                     'OutlineLevel'=>$levels[$parent]+1,
                     'Start'=>$this->sourceIso($byId[$parent]['date_due']), 'Finish'=>$this->sourceIso($byId[$parent]['date_due']),
-                    'Duration'=>'PT0H0M0S','DurationFormat'=>7,'Milestone'=>1,
+                    'Duration'=>'PT0H0M0S','DurationFormat'=>self::DURATION_FORMAT_ELAPSED_DAYS,'Milestone'=>1,
                     'ConstraintType'=>2,'ConstraintDate'=>$this->sourceIso($byId[$parent]['date_due']),
                     'Notes'=>'Marco auxiliar, NAO e um cartao. Data/hora originais: '.$this->rawDate($byId[$parent]['date_due']) .
                         "\nCalendario 24 horas preserva o instante do prazo; marcos auxiliares nao representam trabalho.",
@@ -480,19 +482,13 @@ class ProjectXmlExporter
         $seconds=(int)$due-(int)$start;
         if ($seconds < 0) throw new \InvalidArgumentException('Finish before start in Kanboard');
         if ($seconds > 86400*10000) throw new \InvalidArgumentException('Duration above safety limit');
-        // ProjectLibre Desktop 1.9.8 treats a 00:00:00..23:59:59
-        // 7x24 working day as 1439 minutes, not 1440. For every complete
-        // elapsed 24-hour period, its XML importer shifts Finish forward
-        // by one minute if given the mathematically exact Duration.
-        // Adjust *only the MSPDI Duration*, never source Start/Finish/Deadline.
-        // Verified against a real Kanboard reference XML and a separate
-        // ProjectLibre import diagnostic. This is importer compatibility,
-        // not a change in the Kanboard schedule or effort estimate.
-        $calendarLossSeconds = intdiv($seconds, 86400) * 60;
-        $importerDuration = $seconds - $calendarLossSeconds;
-        $hours=intdiv($importerDuration,3600);
-        $minutes=intdiv($importerDuration % 3600,60);
-        $rest=$importerDuration % 60;
+        // MSPDI Duration is expressed as elapsed days (DurationFormat = 8).
+        // Keep the exact wall-clock interval so ProjectLibre, Microsoft Project
+        // and other readers do not reinterpret 24 elapsed hours as three
+        // eight-hour working days. Start and Finish remain the source values.
+        $hours=intdiv($seconds,3600);
+        $minutes=intdiv($seconds % 3600,60);
+        $rest=$seconds % 60;
         return 'PT'.$hours.'H'.$minutes.'M'.$rest.'S';
     }
     private function rawDate($timestamp)
