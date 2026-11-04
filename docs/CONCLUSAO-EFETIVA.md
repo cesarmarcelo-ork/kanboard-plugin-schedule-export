@@ -1,4 +1,4 @@
-# Conclusão efetiva de subtarefas — 0.6.0-dev
+# Conclusão efetiva de subtarefas — 0.6.1-dev
 
 A tabela mostra início estimado, fim estimado e **Conclusão efetiva**, com cabeçalhos sem quebra de linha. A conclusão exibe a data; o horário completo aparece ao passar o mouse e na tela de detalhes.
 
