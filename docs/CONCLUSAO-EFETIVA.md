@@ -16,7 +16,9 @@ A tabela mostra início estimado, fim estimado e **Conclusão efetiva**, com cab
 
 Migração 2 cria tabelas próprias para data atual e histórico em SQLite, MySQL e PostgreSQL. Excluir a subtarefa exclui seus registros associados. O histórico não é uma trilha independente após exclusão.
 
-Os serviços nativos `subtaskModel` e `subtaskStatusModel` são estendidos, delegando ao núcleo as operações existentes. Plugins que também substituem esses serviços precisam de teste de compatibilidade. Escritas SQL externas que ignoram os modelos não são interceptadas. Não há exportação nova dessas datas no XML nesta alteração.
+Os serviços nativos `subtaskModel` e `subtaskStatusModel` são estendidos, delegando ao núcleo as operações existentes. Plugins que também substituem esses serviços precisam de teste de compatibilidade. Escritas SQL externas que ignoram os modelos não são interceptadas.
+
+Na exportação MSPDI, `Finish` continua representando a data final estimada. A conclusão registrada é exportada separadamente em `ActualFinish`, com `PercentComplete` e `PercentWorkComplete` iguais a 100 e `RemainingDuration` zerada. Subtarefas antigas concluídas sem data efetiva recebem o percentual 100, mas não recebem uma data inventada.
 
 Status e registro da conclusão usam a mesma transação; o alternador nativo inclui o cronômetro nessa transação. Falhas de gravação desfazem a operação. Eventos nativos continuam sendo encaminhados normalmente.
 

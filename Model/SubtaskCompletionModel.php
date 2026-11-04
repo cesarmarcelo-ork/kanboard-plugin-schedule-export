@@ -53,6 +53,29 @@ class SubtaskCompletionModel
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
+    public function getByTaskIds(array $taskIds)
+    {
+        $taskIds = array_values(array_unique(array_filter(array_map('intval', $taskIds), function ($id) {
+            return $id > 0;
+        })));
+        if (empty($taskIds)) return array();
+
+        $placeholders = implode(',', array_fill(0, count($taskIds), '?'));
+        $stmt = $this->pdo->prepare(
+            'SELECT c.subtask_id, c.completed_at, c.revision, s.task_id, t.project_id '
+            . 'FROM schedule_export_subtask_completions c '
+            . 'JOIN subtasks s ON s.id = c.subtask_id '
+            . 'JOIN tasks t ON t.id = s.task_id '
+            . 'WHERE s.task_id IN (' . $placeholders . ')'
+        );
+        $stmt->execute($taskIds);
+        $result = array();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $result[(int)$row['subtask_id']] = $row;
+        }
+        return $result;
+    }
+
     public function history($id)
     {
         $stmt = $this->pdo->prepare('SELECT h.*, u.username FROM schedule_export_completion_history h LEFT JOIN users u ON u.id = h.changed_by WHERE h.subtask_id = ? ORDER BY h.id DESC');

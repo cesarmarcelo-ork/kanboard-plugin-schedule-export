@@ -25,7 +25,7 @@ class ProjectXmlExporter
         return (new DateTimeImmutable('@' . (int)$timestamp))->setTimezone($this->timezone)->format($pattern);
     }
 
-    public function generate(array $project, array $tasks, array $linksByTask, $anchor = null, array $subtasksByTask = array(), $detailedSubtasks = false, array $persistedPlans = array())
+    public function generate(array $project, array $tasks, array $linksByTask, $anchor = null, array $subtasksByTask = array(), $detailedSubtasks = false, array $persistedPlans = array(), array $subtaskCompletions = array())
     {
         $byId = array();
         foreach ($tasks as $task) {
@@ -97,6 +97,21 @@ class ProjectXmlExporter
                 $finish = $this->parseLocalPeriodTimestamp((string)$plan['planned_end']);
                 if ($finish <= $start) throw new \InvalidArgumentException('Invalid persisted subtask period');
                 $subtaskPeriods[$parentId][$subId] = array('start'=>$start,'finish'=>$finish);
+            }
+        }
+        if ($detailedSubtasks) {
+            foreach ($subtaskCompletions as $subId => $completion) {
+                $subId = (int)$subId;
+                $parentId = (int)($completion['task_id'] ?? 0);
+                if (!isset($subIds[$subId]) || !isset($byId[$parentId]) ||
+                    (int)($completion['subtask_id'] ?? 0) !== $subId ||
+                    (int)($completion['project_id'] ?? 0) !== (int)$project['id']) {
+                    throw new \InvalidArgumentException('Completion references an invalid subtask');
+                }
+                $completedAt = $completion['completed_at'] ?? null;
+                if ($completedAt !== null && (!is_numeric($completedAt) || (int)$completedAt <= 0)) {
+                    throw new \InvalidArgumentException('Invalid actual completion timestamp');
+                }
             }
         }
         $ids = array_keys($byId);
@@ -358,6 +373,16 @@ class ProjectXmlExporter
                             ?: $this->iso($anchorDate,self::ANCHOR_CLOCK));
                     $subStart = $period ? $this->sourceIso($period['start']) : $technicalAnchor;
                     $subFinish = $period ? $this->sourceIso($period['finish']) : $subStart;
+                    $isCompleted = (int)($sub['status'] ?? 0) === 2;
+                    $completion = $subtaskCompletions[(int)$sub['id']] ?? null;
+                    $actualFinish = $isCompleted && !empty($completion['completed_at'])
+                        ? $this->sourceIso($completion['completed_at'])
+                        : null;
+                    $subNotes = 'Source: kanboard-subtask:' . $parentId . ':' . (int)$sub['id'] .
+                        ($period
+                            ? "\nPeriodo explicito cadastrado na descricao do cartao Kanboard; horario local: " . $subStart . ' a ' . $subFinish . '.'
+                            : "\nSubtarefa nativa SEM DATAS PROPRIAS; tarefa nao planejada de duracao ZERO, posicionada visualmente no limite do cartao quando disponivel; NAO e agendamento de subtarefa.") .
+                        "\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0');
                     $subFields = array(
                         'UID'=>$nextUid++, 'ID'=>$nextId++,
                         'Name'=>$subName . ($period ? '' : ' [SEM DATAS — NAO PLANEJADA]'),
@@ -367,16 +392,20 @@ class ProjectXmlExporter
                         'Finish'=>$subFinish,
                         'Duration'=>$period ? $this->durationBetween($period['start'],$period['finish']) : 'PT0H0M0S',
                         'DurationFormat'=>7,'Milestone'=>0,
-                        'Notes'=>'Source: kanboard-subtask:' . $parentId . ':' . (int)$sub['id'] .
-                            ($period
-                                ? "\nPeriodo explicito cadastrado na descricao do cartao Kanboard; horario local: " . $subStart . ' a ' . $subFinish . '.'
-                                : "\nSubtarefa nativa SEM DATAS PROPRIAS; tarefa nao planejada de duracao ZERO, posicionada visualmente no limite do cartao quando disponivel; NAO e agendamento de subtarefa.") .
-                            "\nEstimated effort Kanboard (hours): " . (string)($sub['time_estimated'] ?? '0')
+                        'PercentComplete'=>$isCompleted ? 100 : 0,
+                        'PercentWorkComplete'=>$isCompleted ? 100 : 0,
                     );
+                    if ($actualFinish !== null) {
+                        // Finish remains the planned finish. ActualFinish is the
+                        // interoperable MSPDI field for what really happened.
+                        $subFields['ActualFinish'] = $actualFinish;
+                        $subFields['RemainingDuration'] = 'PT0H0M0S';
+                    }
                     if ($period) {
                         $subFields['ConstraintType'] = 2;
                         $subFields['ConstraintDate'] = $subStart;
                     }
+                    $subFields['Notes'] = $subNotes;
                     $xml .= "    <Task>\n" . $this->fields($subFields,3) . "    </Task>\n";
                 }
             }

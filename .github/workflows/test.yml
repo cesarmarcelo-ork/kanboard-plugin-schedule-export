@@ -68,6 +68,8 @@ jobs:
         run: python3 tests/verify_i18n_v050.py
       - name: Verify actual completion lifecycle
         run: php tests/test_completion.php
+      - name: Verify interoperable actual completion in MSPDI
+        run: php tests/test_completion_export.php
       - name: Verify subtask date columns
         run: php tests/test_date_columns.php
       - name: Upload synthetic v0.3.0 MSPDI sample for ProjectLibre review
