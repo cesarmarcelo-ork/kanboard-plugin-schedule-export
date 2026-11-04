@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1 — 2026-11-03
+
+- Replaces the single planning column with separate estimated start and estimated finish columns.
+- Records and displays the actual completion date of native Kanboard subtasks, including automatic synchronization on completion, reopening history and controlled manual correction.
+- Exports `ActualFinish`, completion percentages and zero remaining duration for completed subtasks without overwriting the planned finish.
+- Uses MSPDI elapsed-day duration metadata so ProjectLibre and Open Planner Studio preserve the same calendar interval without converting it into eight-hour workdays.
+- Validated in isolated Kanboard 1.2.50 and in the homelab, with automated coverage on Kanboard 1.2.50/1.2.57 and PHP 8.1–8.4.
+
 ## 0.5.0 — development (not published)
 
 - English source labels with Brazilian Portuguese translations, following the Kanboard user's language.
