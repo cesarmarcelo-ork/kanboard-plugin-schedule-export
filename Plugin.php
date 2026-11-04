@@ -32,8 +32,16 @@ class Plugin extends Base
             'template:subtask:table:rows',
             'ScheduleExport:subtask/period-link',
             function ($subtask) {
-                return array('schedule_export_project_id' =>
-                    $this->subtaskModel->getProjectId((int)$subtask['id']));
+                $projectId = $this->subtaskModel->getProjectId((int)$subtask['id']);
+                $plan = null;
+                if ($projectId && $this->helper->user->hasProjectAccess('SubtaskPlanController', 'edit', $projectId)) {
+                    $model = new \Kanboard\Plugin\ScheduleExport\Model\SubtaskPlanModel($this->db->getConnection());
+                    $plan = $model->get((int)$subtask['id']);
+                }
+                return array(
+                    'schedule_export_project_id' => $projectId,
+                    'schedule_export_plan' => $plan,
+                );
             }
         );
         $this->template->hook->attach(
@@ -68,7 +76,7 @@ class Plugin extends Base
 
     public function getPluginVersion()
     {
-        return '0.5.0';
+        return '0.5.1-dev';
     }
 
     public function getPluginHomepage()
