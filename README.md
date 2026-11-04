@@ -4,19 +4,21 @@
 
 Kanboard plugin for persistent native-subtask scheduling and export of project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
 
-**Development branch:** `0.5.0` (not released). **Published stable:** `0.4.2`. **Validated:** ProjectLibre 1.9.8 on Linux; Open Planner Studio v2026.43.0 MSPDI import, hierarchy, descriptions/subtask estimates, and save/reopen. Independent Kanboard v1.2.57 laboratory testing of the released candidate passed scenarios A–F and a real HTTP-controller export. Full CPM/workload equivalence across applications has not been established.
+**Current release:** `0.6.1`. **Minimum Kanboard:** `1.2.50`. Validated with Kanboard 1.2.50 and 1.2.57, PHP 8.1–8.4, ProjectLibre 1.9.8 on Linux and Open Planner Studio v2026.43.0. Full CPM/workload equivalence across applications is outside the plugin's scope; Kanboard remains authoritative for source dates and native time tracking.
 
-## Kanboard compatibility (v0.4.2 release candidate)
+## Kanboard compatibility
 
-This branch declares **Kanboard >= 1.2.50**, replacing the previous >=1.2.30 minimum. The project maintainer confirms successful functional validation of subtasks, native subtask-to-task conversion, and MSPDI XML export on Kanboard 1.2.50; evidence from this test was not independently inspected in this repository. Prior documented laboratory validation on Kanboard **1.2.57** remains unchanged. The currently published v0.4.1 ZIP and official plugin catalog retain **>=1.2.30** until a separate v0.4.2 release and subsequent directory update. See [v0.4.2 release notes](docs/RELEASE-V042.md).
+Version 0.6.1 declares **Kanboard >= 1.2.50**. The automated matrix exercises Kanboard 1.2.50 and 1.2.57, while functional acceptance was completed in the isolated 1.2.50 notebook environment and in the homelab. See the [v0.6.1 release notes](docs/RELEASE-V061.md).
 
-## v0.5.0 development: bilingual UI and planned subtask creation
+## v0.6.1: planned and actual subtask dates
 
 - Plugin-specific labels now use English source strings and Brazilian Portuguese translations; they follow Kanboard's selected language without changing saved dates.
 - The native **Add a sub-task** form now offers **Create one sub-task with planning**, linking to a dedicated single-subtask form. Enter a title, assignee and estimated time; optionally tick **Plan this sub-task now** and enter planned start/end dates, daily minutes and working days.
 - The native bulk-subtask form is deliberately untouched; dates cannot be silently associated with the wrong subtask when multiple titles are entered.
 - Both the native subtask and its optional plan are persisted together by subtask ID. Failed dates or plan writes do not leave an orphan creation. The existing **Dates** editor, native conversion and MSPDI export continue to work.
-- This work is **unreleased**, requires CI and Kanboard 1.2.50 UI validation; install from a test branch only in an isolated laboratory.
+- The task view presents estimated start, estimated finish and actual completion separately; native time tracking remains unchanged.
+- Actual completion follows the native completed/reopened state and can be corrected under project permissions with history retained.
+- MSPDI export preserves planned `Finish` and records actual completion separately in `ActualFinish`.
 
 ## Use
 
@@ -32,7 +34,7 @@ No personal API token or browser extension is required. The plugin stores subtas
 - Original datetimes are preserved in XML task fields when provided and in the task description; a special 24/7 calendar permits weekend deadlines.
 - Tasks with only a due date become milestones; fully undated tasks are explicitly labeled as unscheduled. These placements are not invented work schedules.
 - Card parent/child links form the work breakdown structure (WBS/EAP). Native checklist subtasks without dates are retained in parent task descriptions, *not* fabricated Gantt bars.
-- Work estimates are separate from the Gantt `Duration` field. The latter includes a ProjectLibre 1.9.8 compatibility adjustment that other importers may interpret differently.
+- Work estimates are separate from the Gantt `Duration` field. Calendar intervals use MSPDI elapsed-day metadata; applications may display the same interval in days or hours.
 - Importer-calculated critical path is **not** authoritative without genuine task precedence links.
 
 ## Quality and installation

@@ -10,7 +10,8 @@ def rows(name):
 
 def f(t,k):return t.findtext('m:'+k,'',N)
 T=rows('real_timestamps');assert f(T[1],'Start')=='2026-09-12T19:21:00';assert f(T[1],'Finish')=='2026-09-20T19:22:00'
-assert f(T[1],'Duration')=='PT191H53M0S',f(T[1],'Duration')  # 192h01m - 8 importer-minutes
+assert f(T[1],'Duration')=='PT192H1M0S',f(T[1],'Duration')
+assert f(T[1],'DurationFormat')=='8',f(T[1],'DurationFormat')  # elapsed days, not 8-hour workdays
 assert f(T[1],'Deadline')=='2026-09-20T19:22:00'
 T=rows('due_only');assert f(T[1],'Start')==f(T[1],'Finish')==f(T[1],'Deadline');assert f(T[1],'Milestone')=='1'
 T=rows('start_only');assert f(T[1],'Start')==f(T[1],'Finish');assert 'NAO CADASTRADO' in f(T[1],'Notes')
