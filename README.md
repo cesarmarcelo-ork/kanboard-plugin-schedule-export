@@ -1,5 +1,13 @@
 # Kanboard Schedule Export
 
+> **DEPRECATED / SUPERSEDED — November 2026**
+> This repository is maintained for historical reference, existing installations and rollback only. **Kanboard Schedule Exchange v0.1.0** is the supported successor and is listed in the official Kanboard plugin catalog.
+> - [Schedule Exchange repository](https://github.com/cesarmarcelo-ork/kanboard-plugin-schedule-exchange)
+> - [Schedule Exchange v0.1.0 release](https://github.com/cesarmarcelo-ork/kanboard-plugin-schedule-exchange/releases/tag/v0.1.0)
+> - [Migration and rollback guidance](https://github.com/cesarmarcelo-ork/kanboard-plugin-schedule-exchange/blob/main/MIGRACAO.md)
+>
+> **Migration warning:** Schedule Exchange uses the **different** plugin directory `plugins/ScheduleExchange` (not `plugins/ScheduleExport`). Back up the Kanboard database and existing plugins before migration. **Do not enable both plugins simultaneously**; they share legacy planning functionality and database objects. The releases below are retained for users who need the previous version.
+
 [![Kanboard plugin](https://img.shields.io/badge/Kanboard-plugin-informational)](https://kanboard.org/)
 
 Kanboard plugin for persistent native-subtask scheduling and export of project schedules as **Microsoft Project XML (MSPDI)**. The export can be opened in compatible scheduling applications; interoperability depends on how each importer handles dates, calendars, durations, and milestones.
