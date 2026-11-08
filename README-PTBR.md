@@ -1,5 +1,13 @@
 # Kanboard Schedule Export — v0.6.1
 
+> **DESCONTINUADO / SUBSTITUÍDO — novembro de 2026**
+> Este repositório é preservado para consulta histórica, instalações existentes e recuperação (rollback). O sucessor recomendado é o **Kanboard Schedule Exchange v0.1.0**, disponível no catálogo oficial de plugins do Kanboard.
+> - [Repositório Schedule Exchange](https://github.com/cesarmarcelo-ork/kanboard-plugin-schedule-exchange)
+> - [Release v0.1.0](https://github.com/cesarmarcelo-ork/kanboard-plugin-schedule-exchange/releases/tag/v0.1.0)
+> - [Orientações de migração e rollback](https://github.com/cesarmarcelo-ork/kanboard-plugin-schedule-exchange/blob/main/MIGRACAO.md)
+>
+> **Atenção à migração:** o novo plugin utiliza a pasta `plugins/ScheduleExchange`, diferente da antiga `plugins/ScheduleExport`. Faça backup do banco de dados e dos plugins antes da migração. **Não mantenha ambos ativos simultaneamente**, pois compartilham funcionalidades e estruturas históricas do banco. As releases antigas permanecem disponíveis.
+
 Plugin de **planejamento de subtarefas e exportação** de projetos Kanboard em **Microsoft Project XML (MSPDI)**. O formato pode ser importado por vários planejadores. Testado com **ProjectLibre Desktop no Linux**; o **Open Planner Studio v2026.43.0** passou nos testes de importação, hierarquia EAP, estimativas individuais nas descrições e persistência após salvar e reabrir. O nome do plugin não significa que todos os importadores estejam homologados.
 
 ## Compatibilidade com o Kanboard
